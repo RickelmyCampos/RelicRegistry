@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -18,7 +17,13 @@ fun RegisterRelic() {
 @Composable
 fun RegisterRelicUi() {
     Column(modifier = Modifier.fillMaxSize()) {
+        Text(text = "Identificador")
+        OutlinedTextField(value = "", onValueChange = {})
         Text(text = "Qual o nome do artefato")
+        OutlinedTextField(value = "", onValueChange = {})
+        Text(text = "Qual a descrição do artefato")
+        OutlinedTextField(value = "", onValueChange = {})
+        Text(text = "Qual a raridade do artefato")
         OutlinedTextField(value = "", onValueChange = {})
     }
 }
