@@ -82,6 +82,7 @@ import com.gilbersoncampos.relicregistry.Constants.usageMarks
 import com.gilbersoncampos.relicregistry.Constants.uses
 import com.gilbersoncampos.relicregistry.R
 import com.gilbersoncampos.relicregistry.data.model.RecordModel
+import com.gilbersoncampos.relicregistry.extensions.hasOnlyNumber
 import com.gilbersoncampos.relicregistry.extensions.toOnlyFloat
 import com.gilbersoncampos.relicregistry.ui.components.CustomDropdown
 import com.gilbersoncampos.relicregistry.ui.components.ImageCarrousel
@@ -163,9 +164,9 @@ fun EditRecordForm(
                     .padding(16.dp)
                     .height(200.dp)
                     .border(0.dp, Color.Black, shape = RoundedCornerShape(12.dp))
-                    .background(Color.Black,shape = RoundedCornerShape(12.dp))
+                    .background(Color.Black, shape = RoundedCornerShape(12.dp))
 
-            ){ selectedImage = it}
+            ) { selectedImage = it }
 
             val pickerMedia =
                 rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(5)) { uris ->
@@ -272,7 +273,11 @@ private fun Sessions(
                 OutlinedTextField(
                     label = { Text(text = "Comprimento (cm)") },
                     value = uiState.record.length.toString(),
-                    onValueChange = { updateRecord(uiState.record.copy(length = it.toOnlyFloat())) },
+                    onValueChange = {newValue->
+                        if (newValue.all {it.isDigit() }) {
+                            updateRecord(uiState.record.copy(length = newValue.toOnlyFloat()))
+                        }
+                    },
                     modifier = Modifier.weight(1f),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
