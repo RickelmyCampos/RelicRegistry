@@ -18,8 +18,10 @@ class RecordListViewModel @Inject constructor(private val repository: RecordRepo
 
     init {
         viewModelScope.launch {
-            val list = repository.getAllRecord()
-            _uiState.value = RecordUiState.Success(list)
+            repository.getAllRecord().collect { list ->
+                _uiState.value = RecordUiState.Success(list)
+            }
+
         }
 
     }

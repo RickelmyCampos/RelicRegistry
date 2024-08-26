@@ -39,13 +39,16 @@ import com.gilbersoncampos.relicregistry.data.model.RecordModel
 import com.gilbersoncampos.relicregistry.ui.theme.RelicRegistryTheme
 
 @Composable
-fun RecordListScreen(viewModel: RecordListViewModel = hiltViewModel(),navigateToEditRecord:(Int)->Unit) {
+fun RecordListScreen(
+    viewModel: RecordListViewModel = hiltViewModel(),
+    navigateToEditRecord: (Int) -> Unit
+) {
     val uiState = viewModel.uiState.collectAsState().value
-    RecordListUI(uiState,onSelectRecord=navigateToEditRecord)
+    RecordListUI(uiState, onSelectRecord = navigateToEditRecord)
 }
 
 @Composable
-fun RecordListUI(uiState: RecordUiState,onSelectRecord:(Int)->Unit) {
+fun RecordListUI(uiState: RecordUiState, onSelectRecord: (Int) -> Unit) {
 
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -53,6 +56,7 @@ fun RecordListUI(uiState: RecordUiState,onSelectRecord:(Int)->Unit) {
             RecordUiState.Error -> {
                 Text(text = "Erro ao buscar a lista")
             }
+
             RecordUiState.Loading -> {
                 Column(
                     Modifier.fillMaxSize(),
@@ -64,13 +68,24 @@ fun RecordListUI(uiState: RecordUiState,onSelectRecord:(Int)->Unit) {
             }
 
             is RecordUiState.Success -> {
-                LazyColumn {
-                    items(uiState.records) {
-                        RelicItem(it){
-                            onSelectRecord(it.id)
+                if (uiState.records.isEmpty()) {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(text = "Nenhuma ficha encontrada, Adicione clicando no botão abaixo")
+                    }
+                } else {
+                    LazyColumn {
+                        items(uiState.records) {
+                            RelicItem(it) {
+                                onSelectRecord(it.id)
+                            }
                         }
                     }
                 }
+
             }
         }
 
@@ -78,10 +93,10 @@ fun RecordListUI(uiState: RecordUiState,onSelectRecord:(Int)->Unit) {
 }
 
 @Composable
-private fun RelicItem(relic: RecordModel,onClick:()->Unit) {
+private fun RelicItem(relic: RecordModel, onClick: () -> Unit) {
     Row(modifier = Modifier
         .fillMaxWidth()
-        .clickable {onClick() }
+        .clickable { onClick() }
         .padding(6.dp)) {
         Image(
             painter = painterResource(id = R.drawable.ic_image_basic),
@@ -102,6 +117,6 @@ private fun RelicItem(relic: RecordModel,onClick:()->Unit) {
 @Composable
 fun RecordListUIPreview() {
     RelicRegistryTheme {
-        RecordListUI(RecordUiState.Loading){}
+        RecordListUI(RecordUiState.Loading) {}
     }
 }
