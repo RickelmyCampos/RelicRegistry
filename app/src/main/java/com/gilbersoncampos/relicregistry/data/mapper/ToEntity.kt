@@ -5,6 +5,7 @@ import com.gilbersoncampos.relicregistry.data.model.RecordModel
 
 fun RecordModel.toEntity(): RecordEntity = RecordEntity(
     id = id,
+    listImages=listImages,
     numbering = numbering,
     place = place,
     shelf = shelf,

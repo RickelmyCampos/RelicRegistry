@@ -7,9 +7,9 @@ import androidx.navigation.compose.composable
 import com.gilbersoncampos.relicregistry.navigation.Destination
 
 val ROUTE = Destination.Home.route
-fun NavGraphBuilder.homeScreen(navigateToEditRecord:(Int)->Unit) {
+fun NavGraphBuilder.homeScreen() {
     composable(ROUTE) {
-        HomeScreen(navigateToEditRecord=navigateToEditRecord)
+        HomeScreen()
     }
 }
 

@@ -2,6 +2,7 @@ package com.gilbersoncampos.relicregistry.data.model
 
 data class RecordModel(
     val id: Int,
+    val listImages: List<String> =emptyList(),
     val numbering: String,
     val place: String,
     val shelf: String,

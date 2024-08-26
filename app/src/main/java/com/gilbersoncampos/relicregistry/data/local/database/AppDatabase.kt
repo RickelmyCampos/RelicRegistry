@@ -16,12 +16,18 @@ abstract class AppDatabase : RoomDatabase() {
 class Converters {
 
     @TypeConverter
-    fun fromString(value: String?): List<String>? {
-        return value?.split(",")?.map { it.trim() }
+    fun fromString(value: String): List<String> {
+        val list = value.split(",")
+        return if (list.size > 1) {
+            list.map { it.trim() }
+        } else {
+            if (list[0].isEmpty()) listOf() else list
+        }
+
     }
 
     @TypeConverter
-    fun fromList(list: List<String>?): String? {
-        return list?.joinToString(",")
+    fun fromList(list: List<String>): String {
+        return list.joinToString(",")
     }
 }

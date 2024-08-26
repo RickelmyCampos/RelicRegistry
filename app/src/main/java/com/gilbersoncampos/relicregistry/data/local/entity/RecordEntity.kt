@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "record")
 data class RecordEntity(
     @PrimaryKey(autoGenerate = true) val id: Int,
+    @ColumnInfo val listImages: List<String>,
     @ColumnInfo val numbering: String,
     @ColumnInfo val place: String,
     @ColumnInfo val shelf: String,
