@@ -43,7 +43,8 @@ data class CatalogRecordModel(
     // Uses
     val uses: List<String> = listOf(),
     // Observations
-    val observations: String
+    val observations: String,
+    val hasDecoration: Boolean = false,
 )
 
 // Enum classes to capture the fixed options

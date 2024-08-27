@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun Session(modifier: Modifier=Modifier,title:String, content:@Composable ()->Unit){
-    Column(modifier.fillMaxWidth().padding(12.dp)) {
+    Column(modifier) {
         Text(text =title, style = MaterialTheme.typography.titleLarge)
         content()
     }

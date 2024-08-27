@@ -102,6 +102,7 @@ import com.gilbersoncampos.relicregistry.data.model.UpperLimbs
 import com.gilbersoncampos.relicregistry.data.model.UsageMarks
 import com.gilbersoncampos.relicregistry.extensions.hasOnlyNumber
 import com.gilbersoncampos.relicregistry.extensions.toOnlyFloat
+import com.gilbersoncampos.relicregistry.ui.components.Accordion
 import com.gilbersoncampos.relicregistry.ui.components.CustomDropdown
 import com.gilbersoncampos.relicregistry.ui.components.ImageCarrousel
 import com.gilbersoncampos.relicregistry.ui.components.ListCheckbox
@@ -109,6 +110,7 @@ import com.gilbersoncampos.relicregistry.ui.components.Session
 import com.gilbersoncampos.relicregistry.ui.components.SubSession
 import com.gilbersoncampos.relicregistry.ui.components.TextCheckbox
 import com.gilbersoncampos.relicregistry.ui.components.TextRadioButton
+import kotlin.math.round
 
 @Composable
 fun EditRecord(idRecord: Long, viewModel: EditRecordViewModel = hiltViewModel()) {
@@ -278,7 +280,7 @@ private fun Sessions(
     uiState: SuccessUiState,
     updateRecord: (CatalogRecordModel) -> Unit
 ) {
-    Session(title = "Dados da Ficha") {
+    Session(title = "Dados da Ficha", modifier = Modifier.padding(16.dp)) {
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             InfosRow(title = "Numeração:", value = uiState.record.identification)
             InfosRow(title = "Sítio arqueológico:", value = uiState.record.archaeologicalSite)
@@ -296,11 +298,11 @@ private fun Sessions(
 
 @Composable
 private fun UsesSession(uiState: CatalogRecordModel, updateRecord: (CatalogRecordModel) -> Unit) {
-    var isOpen by remember {
-        mutableStateOf(false)
-    }
-    Session(title = "Usos", modifier = Modifier.clickable { isOpen = !isOpen }) {
-        if (isOpen) {
+    Accordion(
+        title = "Usos", modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        Column {
 
             ListCheckbox(list = uses, uiState.uses) { selected, _ ->
                 updateRecord(uiState.copy(uses = selected))
@@ -315,15 +317,22 @@ private fun DecorationSession(
     uiState: CatalogRecordModel,
     updateRecord: (CatalogRecordModel) -> Unit
 ) {
-    var isOpen by remember {
-        mutableStateOf(false)
-    }
-    val hasDecoration = true
-    Session(title = "Decoraçao", modifier = Modifier.clickable { isOpen = !isOpen }) {
-        if (isOpen) {
+
+    val hasDecoration = uiState.hasDecoration
+    Accordion(title = "Decoração", modifier = Modifier.fillMaxWidth()) {
+        Column {
             TextCheckbox(
                 onCheckedChange = { hasSelected ->
-                    // updateRecord(uiState.record.copy(decoration = hasSelected))
+                    updateRecord(
+                        uiState.copy(
+                            hasDecoration = hasSelected,
+                            decorationLocation = null,
+                            decorationType = emptyList(),
+                            internalPaintColor = emptyList(),
+                            externalPaintColor = emptyList(),
+                            plasticDecoration = emptyList()
+                        )
+                    )
                 },
                 label = "Possui decoraçao",
                 hasDecoration
@@ -375,6 +384,7 @@ private fun DecorationSession(
                 }
             }
         }
+
     }
 }
 
@@ -383,12 +393,10 @@ private fun TecnologySession(
     uiState: CatalogRecordModel,
     updateRecord: (CatalogRecordModel) -> Unit
 ) {
-    var isOpen by remember {
-        mutableStateOf(false)
-    }
-    Session(title = "Tecnologia", modifier = Modifier.clickable { isOpen = !isOpen }) {
-        if (isOpen) {
 
+    Accordion(title = "Tecnologia", modifier = Modifier.fillMaxWidth()) {
+
+        Column {
             SubSession(title = "Queima") {
                 ListCheckbox(list = Firing.entries, uiState.firing) { selected, _ ->
                     updateRecord(uiState.copy(firing = selected))
@@ -444,6 +452,8 @@ private fun TecnologySession(
                 }
             }
         }
+
+
     }
 }
 
@@ -452,11 +462,9 @@ private fun MorfologySession(
     uiState: CatalogRecordModel,
     updateRecord: (CatalogRecordModel) -> Unit
 ) {
-    var isOpen by remember {
-        mutableStateOf(false)
-    }
-    Session(title = "Morfologia", modifier = Modifier.clickable { isOpen = !isOpen }) {
-        if (isOpen) {
+
+    Accordion(title = "Morfologia", modifier = Modifier.fillMaxWidth()) {
+        Column {
             SubSession(title = "Membros superiores") {
                 ListCheckbox(
                     list = UpperLimbs.entries,
@@ -480,9 +488,6 @@ private fun MorfologySession(
                 TextCheckbox(
                     onCheckedChange = { checked ->
                         hasGenitalia = checked
-                        if (!checked) {
-                            // updateRecord(uiState.record.copy(genitalia = null))
-                        }
                     },
                     label = "Possui genitália",
                     hasGenitalia
@@ -521,11 +526,9 @@ private fun TopologySession(
     uiState: CatalogRecordModel,
     updateRecord: (CatalogRecordModel) -> Unit
 ) {
-    var isOpen by remember {
-        mutableStateOf(false)
-    }
-    Session(title = "Tipologia", modifier = Modifier.clickable { isOpen = !isOpen }) {
-        if (isOpen) {
+
+    Accordion(title = "Tipologia", modifier = Modifier.fillMaxWidth()) {
+        Column {
             SubSession(title = "Tipo") {
                 CustomDropdown(
                     title = "Tipo",
@@ -554,6 +557,8 @@ private fun TopologySession(
                     })
             }
         }
+
+
     }
 }
 
@@ -574,68 +579,84 @@ private fun DimensionSession(
     var weight by remember {
         mutableStateOf(uiState.weight?.toString() ?: "")
     }
-    var isOpen by remember {
-        mutableStateOf(false)
-    }
-    Session(title = "Dimensões", modifier = Modifier.clickable { isOpen = !isOpen }) {
-        if (isOpen) {
-            Column {
-                Row(Modifier.fillMaxWidth()) {
-                    OutlinedTextField(
-                        label = { Text(text = "Comprimento (cm)") },
-                        value = length,
-                        onValueChange = { newValue ->
-                            if (newValue.all { it.isDigit() }) {
-                                length = newValue
-                                updateRecord(uiState.copy(length = newValue.toOnlyFloat()))
-                            }
-                        },
-                        modifier = Modifier.weight(1f),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                    )
-                    OutlinedTextField(
-                        label = { Text(text = "Largura (cm)") },
-                        value = width,
-                        onValueChange = { newValue ->
-                            if (newValue.all { it.isDigit() }) {
-                                width = newValue
+    Accordion(title = "Dimensões", modifier = Modifier.fillMaxWidth()) {
+        Column {
+            Row(Modifier.fillMaxWidth()) {
+                OutlinedTextField(
+                    label = { Text(text = "Comprimento (cm)") },
+                    value = length,
+                    onValueChange = { newValue ->
+                        if (newValue.all { it.isDigit() || it == '.' }) {
+                            length = newValue
 
-                                updateRecord(uiState.copy(width = newValue.toOnlyFloat()))
+                            val formatted = newValue.toFloatOrNull()?.let {
+                                round(it * 100) / 100
                             }
-                        },
-                        modifier = Modifier.weight(1f),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                    )
-                }
-                Row(Modifier.fillMaxWidth()) {
-                    OutlinedTextField(
-                        label = { Text(text = "Altura (cm)") },
-                        value = height,
-                        onValueChange = { newValue ->
-                            if (newValue.all { it.isDigit() }) {
-                                height = newValue
-                                updateRecord(uiState.copy(height = newValue.toOnlyFloat()))
+                            length = newValue
+                            updateRecord(uiState.copy(length = formatted))
+                        }
+                    },
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
+                OutlinedTextField(
+                    label = { Text(text = "Largura (cm)") },
+                    value = width,
+                    onValueChange = { newValue ->
+                        if (newValue.all { it.isDigit() || it == '.' }) {
+                            width = newValue
+
+                            val formatted = newValue.toFloatOrNull()?.let {
+                                round(it * 100) / 100
                             }
-                        },
-                        modifier = Modifier.weight(1f),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                    )
-                    OutlinedTextField(
-                        label = { Text(text = "Peso (kg)") },
-                        value = weight,
-                        onValueChange = { newValue ->
-                            if (newValue.all { it.isDigit() }) {
-                                weight = newValue
-                                //updateRecord(uiState.record.copy(length = newValue.toOnlyFloat()))
+                            width = newValue
+
+                            updateRecord(uiState.copy(width = formatted))
+                        }
+                    },
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
+            }
+            Row(Modifier.fillMaxWidth()) {
+                OutlinedTextField(
+                    label = { Text(text = "Altura (cm)") },
+                    value = height,
+                    onValueChange = { newValue ->
+                        if (newValue.all { it.isDigit() || it == '.' }) {
+                            height = newValue
+
+                            val formatted = newValue.toFloatOrNull()?.let {
+                                round(it * 100) / 100
                             }
-                            //  updateRecord(uiState.record.copy(weight = it.toOnlyFloat()))
-                        },
-                        modifier = Modifier.weight(1f),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                    )
-                }
+                            height = newValue
+                            updateRecord(uiState.copy(height = formatted))
+                        }
+                    },
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
+                OutlinedTextField(
+                    label = { Text(text = "Peso (kg)") },
+                    value = weight,
+                    onValueChange = { newValue ->
+                        if (newValue.all { it.isDigit() || it == '.' }) {
+                            weight = newValue
+
+                            val formatted = newValue.toFloatOrNull()?.let {
+                                round(it * 100) / 100
+                            }
+                            weight = newValue
+                            updateRecord(uiState.copy(weight = formatted))
+                        }
+
+                    },
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
             }
         }
+
     }
 }
 

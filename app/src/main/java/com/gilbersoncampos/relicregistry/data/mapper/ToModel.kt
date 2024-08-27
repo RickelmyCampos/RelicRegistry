@@ -94,6 +94,7 @@ fun CatalogRecordEntity.toModel(): CatalogRecordModel {
         // Observations
         observations = this.observations,
         id = this.id,
-        listImages = this.listImages
+        listImages = this.listImages,
+        hasDecoration = this.hasDecoration
     )
 }

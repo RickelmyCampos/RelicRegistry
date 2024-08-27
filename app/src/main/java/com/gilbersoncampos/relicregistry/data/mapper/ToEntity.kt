@@ -60,6 +60,7 @@ fun CatalogRecordModel.toEntity(): CatalogRecordEntity {
         // Observations
         observations = this.observations,
         listImages = this.listImages,
-        id = this.id
+        id = this.id,
+        hasDecoration = this.hasDecoration
     )
 }

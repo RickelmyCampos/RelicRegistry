@@ -61,5 +61,6 @@ data class CatalogRecordEntity(
     val uses: String, // Store as JSON string
 
     // Observations
-    val observations: String
+    val observations: String,
+    val hasDecoration: Boolean ,
 )

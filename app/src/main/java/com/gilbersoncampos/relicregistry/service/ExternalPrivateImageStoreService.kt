@@ -18,7 +18,7 @@ import java.io.IOException
 import java.io.OutputStream
 
 class ExternalPrivateImageStoreService(val appContext: Context) : ImageStoreService {
-
+//TODO adicionar feature para apagar as imagens que não não mais usadas
     override fun saveImage(bitmap: Bitmap, nameImage: String): String {
         validateImageName(nameImage)
         val imageFile = createImageFile(nameImage)
