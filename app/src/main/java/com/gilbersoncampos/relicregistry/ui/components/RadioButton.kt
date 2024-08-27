@@ -18,31 +18,31 @@ import androidx.compose.ui.unit.dp
 import com.gilbersoncampos.relicregistry.ui.theme.RelicRegistryTheme
 
 @Composable
-fun TextRadioButton(
-    radioOptions: List<String>,
-    selectedOption: String?,
-    onOptionSelected: (String) -> Unit
+fun<T> TextRadioButton(
+    radioOptions: List<T>,
+    selectedOption: T?,
+    onOptionSelected: (T) -> Unit
 ) {
 
     Column {
-        radioOptions.forEach { text ->
+        radioOptions.forEach { item ->
             Row(
                 Modifier
                     .fillMaxWidth()
                     .selectable(
-                        selected = (text == selectedOption),
+                        selected = (item == selectedOption),
                         onClick = {
-                            onOptionSelected(text)
+                            onOptionSelected(item)
                         }
                     )
                     , verticalAlignment = Alignment.CenterVertically
             ) {
                 RadioButton(
-                    selected = (text == selectedOption),
-                    onClick = { onOptionSelected(text) }
+                    selected = (item == selectedOption),
+                    onClick = { onOptionSelected(item) }
                 )
                 Text(
-                    text = text,
+                    text = item.toString(),
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(start = 16.dp)
                 )

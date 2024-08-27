@@ -10,10 +10,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 @Composable
-fun ListCheckbox(
-    list: List<String>,
-    listSelected: List<String>,
-    onCheckedChange: (List<String>, Boolean) -> Unit
+fun<T> ListCheckbox(
+    list: List<T>,
+    listSelected: List<T>,
+    onCheckedChange: (List<T>, Boolean) -> Unit
 ) {
     list.forEach { item ->
         val mListSelected = listSelected.toMutableList()
@@ -25,7 +25,7 @@ fun ListCheckbox(
                 mListSelected.add(item)
             }
             onCheckedChange(mListSelected, true)
-        }, item, listSelected.contains(item))
+        }, item.toString(), listSelected.contains(item))
     }
 }
 

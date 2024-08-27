@@ -15,12 +15,12 @@ fun NavGraphBuilder.editRecordScreen() {
     composable(route = ROUTE, arguments  = listOf(navArgument("id_record") { type = NavType.StringType })) {
         backStackEntry ->
         val idBackStack=backStackEntry.arguments?.getString("id_record")
-        val idRecord: Int = idBackStack?.toInt() ?: 0
+        val idRecord: Long = idBackStack?.toLong() ?: 0
         EditRecord(idRecord = idRecord)
     }
 }
 
-fun NavHostController.navigateToEditRecord(id: Int, navOptions: NavOptions? = null) {
+fun NavHostController.navigateToEditRecord(id: Long, navOptions: NavOptions? = null) {
     val routeWithId = ROUTE.replace("{id_record}", id.toString())
     navigate(route = routeWithId, navOptions = navOptions)
 

@@ -12,8 +12,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun Session(title:String, content:@Composable ()->Unit){
-    Column(Modifier.fillMaxWidth().padding(12.dp)) {
+fun Session(modifier: Modifier=Modifier,title:String, content:@Composable ()->Unit){
+    Column(modifier.fillMaxWidth().padding(12.dp)) {
         Text(text =title, style = MaterialTheme.typography.titleLarge)
         content()
     }

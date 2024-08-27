@@ -24,10 +24,10 @@ import com.gilbersoncampos.relicregistry.ui.theme.RelicRegistryTheme
 
 
 @Composable
-fun CustomDropdown(
-    list: List<String>,
-    selectedState: String?,
-    onSelect: (String) -> Unit,
+fun<T> CustomDropdown(
+    list: List<T>,
+    selectedState: T?,
+    onSelect: (T) -> Unit,
     title: String
 ) {
     var expanded by remember {
@@ -44,7 +44,7 @@ fun CustomDropdown(
         onClick = { expanded = !expanded },
         modifier = Modifier.fillMaxWidth(),
         ) {
-        Text(text = selectedState?: "Selecione uma opção")
+        Text(text = selectedState?.toString()?: "Selecione uma opção")
     }
     RenderDropDownModal(
         list = list,
@@ -58,11 +58,11 @@ fun CustomDropdown(
 }
 
 @Composable
-fun RenderDropDownModal(
-    list: List<String>,
+fun<T> RenderDropDownModal(
+    list: List<T>,
     expanded: Boolean,
-    selectState: (String) -> Unit,
-    selectedState: String?,
+    selectState: (T) -> Unit,
+    selectedState: T?,
     title: String,
     onDismissRequest: () -> Unit
 ) {
@@ -92,14 +92,14 @@ fun RenderDropDownModal(
 }
 
 @Composable
-fun DropDownItem(
-    item: String,
+fun<T> DropDownItem(
+    item: T,
     isSelected: Boolean = false,
-    onSelect: (String) -> Unit
+    onSelect: (T) -> Unit
 ) {
     DropdownMenuItem(
         colors = MenuDefaults.itemColors(textColor = if (isSelected) MaterialTheme.colorScheme.primary else Color.Black),
-        text = { Text(item) },
+        text = { Text(item.toString()) },
         onClick = { onSelect(item) })
 }
 

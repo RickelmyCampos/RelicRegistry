@@ -4,19 +4,19 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
-import com.gilbersoncampos.relicregistry.data.local.entity.RecordEntity
+import com.gilbersoncampos.relicregistry.data.local.entity.CatalogRecordEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface RecordDao {
     @Insert
-    suspend fun createRecord(record: RecordEntity)
-    @Query("SELECT * FROM record")
-     fun getAllRecord(): Flow<List<RecordEntity>>
-    @Query("SELECT * FROM record ORDER BY id DESC LIMIT 1")
-    suspend fun getLastRecord():RecordEntity
-    @Query("SELECT * FROM record WHERE id = :id")
-     fun getRecordById(id:Int):Flow<RecordEntity>
+    suspend fun createRecord(record: CatalogRecordEntity)
+    @Query("SELECT * FROM catalog_records")
+     fun getAllRecord(): Flow<List<CatalogRecordEntity>>
+    @Query("SELECT * FROM catalog_records ORDER BY id DESC LIMIT 1")
+    suspend fun getLastRecord():CatalogRecordEntity
+    @Query("SELECT * FROM catalog_records WHERE id = :id")
+     fun getRecordById(id:Long):Flow<CatalogRecordEntity>
     @Update
-    suspend fun updateRecord(record: RecordEntity)
+    suspend fun updateRecord(record: CatalogRecordEntity)
 }

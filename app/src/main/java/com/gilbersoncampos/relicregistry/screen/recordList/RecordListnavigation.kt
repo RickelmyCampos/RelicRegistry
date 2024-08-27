@@ -8,7 +8,7 @@ import com.gilbersoncampos.relicregistry.navigation.Destination
 import com.gilbersoncampos.relicregistry.screen.home.HomeScreen
 
 val ROUTE = Destination.ListRecord.route
-fun NavGraphBuilder.recordListScreen(navigateToEditRecord:(Int)->Unit) {
+fun NavGraphBuilder.recordListScreen(navigateToEditRecord:(Long)->Unit) {
     composable(ROUTE) {
         RecordListScreen(navigateToEditRecord=navigateToEditRecord)
     }

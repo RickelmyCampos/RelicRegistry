@@ -2,6 +2,7 @@ package com.gilbersoncampos.relicregistry.screen.recordList
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gilbersoncampos.relicregistry.data.model.CatalogRecordModel
 import com.gilbersoncampos.relicregistry.data.model.RecordModel
 import com.gilbersoncampos.relicregistry.data.repository.RecordRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,7 +29,7 @@ class RecordListViewModel @Inject constructor(private val repository: RecordRepo
 }
 
 sealed class RecordUiState {
-    data class Success(val records: List<RecordModel>) : RecordUiState()
+    data class Success(val records: List<CatalogRecordModel>) : RecordUiState()
     object Error : RecordUiState()
     object Loading : RecordUiState()
 

@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gilbersoncampos.relicregistry.data.model.CatalogRecordModel
 import com.gilbersoncampos.relicregistry.data.model.RecordModel
 import com.gilbersoncampos.relicregistry.data.repository.RecordRepository
 import com.gilbersoncampos.relicregistry.data.services.ImageStoreService
@@ -26,28 +27,17 @@ class EditRecordViewModel @Inject constructor(
     ViewModel() {
     private val _uiState = MutableStateFlow<EditRecordUiState>(EditRecordUiState.Loading)
     val uiState: StateFlow<EditRecordUiState> = _uiState
-    private lateinit var _savedRecord: RecordModel
-    fun getRecord(id: Int) {
+    private lateinit var _savedRecord: CatalogRecordModel
+
+        fun getRecord(id: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.getRecordById(id).collectLatest { record ->
                 _savedRecord = record
-                val imageNames = _savedRecord.listImages
-                _uiState.value = EditRecordUiState.Success(
-                    MutableSuccessUiState(
-                        _savedRecord.copy(),
-                        true,
-                        emptyList()
-                    )
-                )
+
+                updateUiState( _savedRecord.copy())
                 viewModelScope.launch(Dispatchers.IO) {
                     val bitmaps = _savedRecord.listImages.map { getImage(it) }
-                    _uiState.value = EditRecordUiState.Success(
-                        MutableSuccessUiState(
-                            _savedRecord.copy(),
-                            true,
-                            bitmaps
-                        )
-                    )
+                    updateUiState(_savedRecord.copy(), images = bitmaps)
                 }
 
             }
@@ -55,53 +45,22 @@ class EditRecordViewModel @Inject constructor(
     }
 
 
-    fun updateRecord(record: RecordModel) {
-        _uiState.value = EditRecordUiState.Success(
-            MutableSuccessUiState(
-                record,
-                images = (_uiState.value as EditRecordUiState.Success).state.images
-            )
-        )
-        verifySynchronized()
-    }
 
-    private fun verifySynchronized() {
-        when (_uiState.value) {
-            is EditRecordUiState.Error -> TODO()
-            EditRecordUiState.Loading -> TODO()
-            is EditRecordUiState.Success -> _uiState.value = EditRecordUiState.Success(
-                MutableSuccessUiState(
-                    record = (_uiState.value as EditRecordUiState.Success).state.record.copy(),
-                    isSynchronized = _savedRecord == (_uiState.value as EditRecordUiState.Success).state.record,
-                    images =  (_uiState.value as EditRecordUiState.Success).state.images
-                )
-            )
-        }
-
-    }
 
     fun saveImages(uris: List<Uri>) {
         val imageNames: MutableList<String> = mutableListOf()
         val imagesBitmaps: MutableList<Bitmap> = mutableListOf()
         uris.forEachIndexed { index, item ->
             val name =
-                "Record_${(_uiState.value as EditRecordUiState.Success).state.record.numbering}_$index"
+                "Record_${(_uiState.value as EditRecordUiState.Success).state.record.identification}_$index"
             imageStoreService.saveImageByUri(
                 item,
                 name
             )
             imageNames.add(name)
             imagesBitmaps.add(getImage(name))
+            updateUiState(record = (_uiState.value as EditRecordUiState.Success).state.record.copy(listImages = imageNames), images = imagesBitmaps)
         }
-
-        _uiState.value = EditRecordUiState.Success(
-            MutableSuccessUiState(
-                record = (_uiState.value as EditRecordUiState.Success).state.record.copy(listImages = imageNames),
-                isSynchronized = _savedRecord == (_uiState.value as EditRecordUiState.Success).state.record,
-                images =  imagesBitmaps
-            )
-        )
-        verifySynchronized()
     }
 
     fun getImage(name: String): Bitmap {
@@ -113,6 +72,16 @@ class EditRecordViewModel @Inject constructor(
             repository.updateRecord((_uiState.value as EditRecordUiState.Success).state.record)
         }
     }
+     fun updateUiState(record: CatalogRecordModel, images: List<Bitmap> = emptyList()) {
+        _uiState.value = EditRecordUiState.Success(
+            SuccessUiState(
+                record = record,
+                isSynchronized = _savedRecord == record,
+                images = images.ifEmpty { (_uiState.value as? EditRecordUiState.Success)?.state?.images.orEmpty() }
+            )
+        )
+    }
+
 }
 
 sealed class EditRecordUiState {
@@ -121,13 +90,9 @@ sealed class EditRecordUiState {
     data class Error(val message: String) : EditRecordUiState()
 }
 
-class MutableSuccessUiState(
-    override val record: RecordModel,
-    override val isSynchronized: Boolean = false, override val images: List<Bitmap>
-) : SuccessUiState
 
-interface SuccessUiState {
-    val record: RecordModel
-    val isSynchronized: Boolean
+data class SuccessUiState(
+    val record: CatalogRecordModel,
+    val isSynchronized: Boolean,
     val images: List<Bitmap>
-}
+)

@@ -1,6 +1,5 @@
 package com.gilbersoncampos.relicregistry
 
-import com.gilbersoncampos.relicregistry.data.model.CheckboxData
 import com.gilbersoncampos.relicregistry.data.model.DropdownData
 
 

@@ -1,13 +1,14 @@
 package com.gilbersoncampos.relicregistry.data.repository
 
+import com.gilbersoncampos.relicregistry.data.model.CatalogRecordModel
 import com.gilbersoncampos.relicregistry.data.model.RecordModel
 import kotlinx.coroutines.flow.Flow
 
 interface RecordRepository{
-    suspend fun createRecord(record: RecordModel)
-    suspend fun getAllRecord(): Flow<List<RecordModel>>
-    suspend fun getLastRecord():RecordModel
-    suspend fun getRecordById(id:Int): Flow<RecordModel>
-    suspend fun updateRecord(record: RecordModel)
+    suspend fun createRecord(record: CatalogRecordModel)
+    suspend fun getAllRecord(): Flow<List<CatalogRecordModel>>
+    suspend fun getLastRecord():CatalogRecordModel
+    suspend fun getRecordById(id:Long): Flow<CatalogRecordModel>
+    suspend fun updateRecord(record: CatalogRecordModel)
 
 }

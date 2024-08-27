@@ -35,20 +35,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.gilbersoncampos.relicregistry.R
+import com.gilbersoncampos.relicregistry.data.model.CatalogRecordModel
 import com.gilbersoncampos.relicregistry.data.model.RecordModel
 import com.gilbersoncampos.relicregistry.ui.theme.RelicRegistryTheme
 
 @Composable
 fun RecordListScreen(
     viewModel: RecordListViewModel = hiltViewModel(),
-    navigateToEditRecord: (Int) -> Unit
+    navigateToEditRecord: (Long) -> Unit
 ) {
     val uiState = viewModel.uiState.collectAsState().value
     RecordListUI(uiState, onSelectRecord = navigateToEditRecord)
 }
 
 @Composable
-fun RecordListUI(uiState: RecordUiState, onSelectRecord: (Int) -> Unit) {
+fun RecordListUI(uiState: RecordUiState, onSelectRecord: (Long) -> Unit) {
 
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -93,7 +94,7 @@ fun RecordListUI(uiState: RecordUiState, onSelectRecord: (Int) -> Unit) {
 }
 
 @Composable
-private fun RelicItem(relic: RecordModel, onClick: () -> Unit) {
+private fun RelicItem(relic: CatalogRecordModel, onClick: () -> Unit) {
     Row(modifier = Modifier
         .fillMaxWidth()
         .clickable { onClick() }
@@ -107,7 +108,7 @@ private fun RelicItem(relic: RecordModel, onClick: () -> Unit) {
         )
         Spacer(modifier = Modifier.width(4.dp))
         Column {
-            Text(text = relic.numbering, style = MaterialTheme.typography.titleLarge)
+            Text(text = relic.identification, style = MaterialTheme.typography.titleLarge)
             Text(text = relic.group, style = MaterialTheme.typography.titleSmall)
         }
     }

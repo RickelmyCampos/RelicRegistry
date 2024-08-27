@@ -81,7 +81,25 @@ import com.gilbersoncampos.relicregistry.Constants.upperLimbs
 import com.gilbersoncampos.relicregistry.Constants.usageMarks
 import com.gilbersoncampos.relicregistry.Constants.uses
 import com.gilbersoncampos.relicregistry.R
+import com.gilbersoncampos.relicregistry.data.model.BodyPosition
+import com.gilbersoncampos.relicregistry.data.model.CatalogRecordModel
+import com.gilbersoncampos.relicregistry.data.model.Condition
+import com.gilbersoncampos.relicregistry.data.model.DecorationLocation
+import com.gilbersoncampos.relicregistry.data.model.DecorationType
+import com.gilbersoncampos.relicregistry.data.model.Firing
+import com.gilbersoncampos.relicregistry.data.model.GeneralBodyShape
+import com.gilbersoncampos.relicregistry.data.model.Genitalia
+import com.gilbersoncampos.relicregistry.data.model.LowerLimbs
+import com.gilbersoncampos.relicregistry.data.model.ManufacturingMarks
+import com.gilbersoncampos.relicregistry.data.model.ManufacturingTechnique
+import com.gilbersoncampos.relicregistry.data.model.PaintColor
+import com.gilbersoncampos.relicregistry.data.model.PlasticDecoration
 import com.gilbersoncampos.relicregistry.data.model.RecordModel
+import com.gilbersoncampos.relicregistry.data.model.StatueType
+import com.gilbersoncampos.relicregistry.data.model.SurfaceTreatment
+import com.gilbersoncampos.relicregistry.data.model.Temper
+import com.gilbersoncampos.relicregistry.data.model.UpperLimbs
+import com.gilbersoncampos.relicregistry.data.model.UsageMarks
 import com.gilbersoncampos.relicregistry.extensions.hasOnlyNumber
 import com.gilbersoncampos.relicregistry.extensions.toOnlyFloat
 import com.gilbersoncampos.relicregistry.ui.components.CustomDropdown
@@ -93,16 +111,17 @@ import com.gilbersoncampos.relicregistry.ui.components.TextCheckbox
 import com.gilbersoncampos.relicregistry.ui.components.TextRadioButton
 
 @Composable
-fun EditRecord(idRecord: Int, viewModel: EditRecordViewModel = hiltViewModel()) {
+fun EditRecord(idRecord: Long, viewModel: EditRecordViewModel = hiltViewModel()) {
     val uiState = viewModel.uiState.collectAsState().value
     LaunchedEffect(idRecord) {
         viewModel.getRecord(idRecord)
     }
     EditRecordUi(
         uiState = uiState,
-        updateRecord = viewModel::updateRecord,
+        updateRecord = viewModel::updateUiState,
         saveRecord = viewModel::saveRecord,
         saveImages = viewModel::saveImages
+
     )
 }
 
@@ -110,7 +129,7 @@ fun EditRecord(idRecord: Int, viewModel: EditRecordViewModel = hiltViewModel()) 
 @Composable
 fun EditRecordUi(
     uiState: EditRecordUiState,
-    updateRecord: (RecordModel) -> Unit,
+    updateRecord: (CatalogRecordModel) -> Unit,
     saveRecord: () -> Unit,
     saveImages: (List<Uri>) -> Unit
 ) {
@@ -121,7 +140,7 @@ fun EditRecordUi(
         EditRecordUiState.Loading -> Text(text = "Carregando")
         is EditRecordUiState.Success -> Column {
             TopAppBar(
-                title = { Text(text = "Ficha: ${uiState.state.record.numbering}") },
+                title = { Text(text = "Ficha: ${uiState.state.record.identification}") },
                 actions = {
                     Row {
                         if (!uiState.state.isSynchronized) {
@@ -145,7 +164,7 @@ fun EditRecordUi(
 @Composable
 fun EditRecordForm(
     uiState: SuccessUiState,
-    updateRecord: (RecordModel) -> Unit,
+    updateRecord: (CatalogRecordModel) -> Unit,
     saveImages: (List<Uri>) -> Unit
 ) {
 
@@ -257,235 +276,365 @@ private fun FullScreenImageDialog(bitmap: Bitmap, onDismiss: () -> Unit) {
 @Composable
 private fun Sessions(
     uiState: SuccessUiState,
-    updateRecord: (RecordModel) -> Unit
+    updateRecord: (CatalogRecordModel) -> Unit
 ) {
     Session(title = "Dados da Ficha") {
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            InfosRow(title = "Numeração:", value = uiState.record.numbering)
-            InfosRow(title = "Sítio arqueológico:", value = uiState.record.place)
-            InfosRow(title = "Prateleira:", value = uiState.record.shelf)
+            InfosRow(title = "Numeração:", value = uiState.record.identification)
+            InfosRow(title = "Sítio arqueológico:", value = uiState.record.archaeologicalSite)
+            InfosRow(title = "Prateleira:", value = uiState.record.shelfLocation)
             InfosRow(title = "Grupo:", value = uiState.record.group)
         }
     }
-    Session(title = "Dimensões") {
-        Column {
-            Row(Modifier.fillMaxWidth()) {
-                OutlinedTextField(
-                    label = { Text(text = "Comprimento (cm)") },
-                    value = uiState.record.length.toString(),
-                    onValueChange = {newValue->
-                        if (newValue.all {it.isDigit() }) {
-                            updateRecord(uiState.record.copy(length = newValue.toOnlyFloat()))
+    DimensionSession(uiState.record, updateRecord)
+    TopologySession(uiState.record, updateRecord)
+    MorfologySession(uiState.record, updateRecord)
+    TecnologySession(uiState.record, updateRecord)
+    DecorationSession(uiState.record, updateRecord)
+    UsesSession(uiState.record, updateRecord)
+}
+
+@Composable
+private fun UsesSession(uiState: CatalogRecordModel, updateRecord: (CatalogRecordModel) -> Unit) {
+    var isOpen by remember {
+        mutableStateOf(false)
+    }
+    Session(title = "Usos", modifier = Modifier.clickable { isOpen = !isOpen }) {
+        if (isOpen) {
+
+            ListCheckbox(list = uses, uiState.uses) { selected, _ ->
+                updateRecord(uiState.copy(uses = selected))
+
+            }
+        }
+    }
+}
+
+@Composable
+private fun DecorationSession(
+    uiState: CatalogRecordModel,
+    updateRecord: (CatalogRecordModel) -> Unit
+) {
+    var isOpen by remember {
+        mutableStateOf(false)
+    }
+    val hasDecoration = true
+    Session(title = "Decoraçao", modifier = Modifier.clickable { isOpen = !isOpen }) {
+        if (isOpen) {
+            TextCheckbox(
+                onCheckedChange = { hasSelected ->
+                    // updateRecord(uiState.record.copy(decoration = hasSelected))
+                },
+                label = "Possui decoraçao",
+                hasDecoration
+            )
+            if (hasDecoration) {
+                SubSession(title = "Local") {
+                    TextRadioButton(
+                        DecorationLocation.entries,
+                        uiState.decorationLocation
+                    ) {
+                        updateRecord(uiState.copy(decorationLocation = it))
+                    }
+                }
+                SubSession(title = "Tipo de Decoraçao") {
+                    ListCheckbox(
+                        list = DecorationType.entries,
+                        uiState.decorationType
+                    ) { selected, _ ->
+                        updateRecord(uiState.copy(decorationType = selected))
+
+                    }
+                }
+                SubSession(title = "Cor da pintura (F.I.)") {
+                    ListCheckbox(
+                        list = PaintColor.entries,
+                        uiState.internalPaintColor
+                    ) { selected, _ ->
+                        updateRecord(uiState.copy(internalPaintColor = selected))
+
+                    }
+                }
+                SubSession(title = "Cor da pintura (F.E.)") {
+                    ListCheckbox(
+                        list = PaintColor.entries,
+                        uiState.externalPaintColor
+                    ) { selected, _ ->
+                        updateRecord(uiState.copy(externalPaintColor = selected))
+
+                    }
+                }
+                SubSession(title = "Decoração plástica") {
+                    ListCheckbox(
+                        list = PlasticDecoration.entries,
+                        uiState.plasticDecoration
+                    ) { selected, _ ->
+                        updateRecord(uiState.copy(plasticDecoration = selected))
+
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun TecnologySession(
+    uiState: CatalogRecordModel,
+    updateRecord: (CatalogRecordModel) -> Unit
+) {
+    var isOpen by remember {
+        mutableStateOf(false)
+    }
+    Session(title = "Tecnologia", modifier = Modifier.clickable { isOpen = !isOpen }) {
+        if (isOpen) {
+
+            SubSession(title = "Queima") {
+                ListCheckbox(list = Firing.entries, uiState.firing) { selected, _ ->
+                    updateRecord(uiState.copy(firing = selected))
+
+                }
+            }
+            SubSession(title = "Antiplástico") {
+                ListCheckbox(list = Temper.entries, uiState.temper) { selected, _ ->
+                    updateRecord(uiState.copy(temper = selected))
+
+                }
+            }
+            SubSession(title = "Técnica de fabricação") {
+                ListCheckbox(
+                    list = ManufacturingTechnique.entries,
+                    uiState.manufacturingTechnique
+                ) { selected, _ ->
+                    updateRecord(uiState.copy(manufacturingTechnique = selected))
+
+                }
+            }
+            SubSession(title = "Marcas de fabricação") {
+                ListCheckbox(
+                    list = ManufacturingMarks.entries,
+                    uiState.manufacturingMarks
+                ) { selected, _ ->
+                    updateRecord(uiState.copy(manufacturingMarks = selected))
+
+                }
+            }
+            SubSession(title = "Marcas de uso") {
+                ListCheckbox(list = UsageMarks.entries, uiState.usageMarks) { selected, _ ->
+                    updateRecord(uiState.copy(usageMarks = selected))
+
+                }
+            }
+            SubSession(title = "Tratamento de SUP. (I.T.)") {
+                ListCheckbox(
+                    list = SurfaceTreatment.entries,
+                    uiState.surfaceTreatmentInternal
+                ) { selected, _ ->
+                    updateRecord(uiState.copy(surfaceTreatmentInternal = selected))
+
+                }
+            }
+            SubSession(title = "Tratamento de SUP. (E.T.)") {
+                ListCheckbox(
+                    list = SurfaceTreatment.entries,
+                    uiState.surfaceTreatmentExternal
+                ) { selected, _ ->
+                    updateRecord(uiState.copy(surfaceTreatmentExternal = selected))
+
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun MorfologySession(
+    uiState: CatalogRecordModel,
+    updateRecord: (CatalogRecordModel) -> Unit
+) {
+    var isOpen by remember {
+        mutableStateOf(false)
+    }
+    Session(title = "Morfologia", modifier = Modifier.clickable { isOpen = !isOpen }) {
+        if (isOpen) {
+            SubSession(title = "Membros superiores") {
+                ListCheckbox(
+                    list = UpperLimbs.entries,
+                    uiState.upperLimbs
+                ) { selected, _ ->
+                    updateRecord(uiState.copy(upperLimbs = selected))
+                }
+            }
+            SubSession(title = "Membros inferiores") {
+                ListCheckbox(
+                    list = LowerLimbs.entries,
+                    uiState.lowerLimbs
+                ) { selected, _ ->
+                    updateRecord(uiState.copy(lowerLimbs = selected))
+                }
+            }
+            SubSession(title = "Fabricação de genitália") {
+                var hasGenitalia by remember {
+                    mutableStateOf(false)
+                }
+                TextCheckbox(
+                    onCheckedChange = { checked ->
+                        hasGenitalia = checked
+                        if (!checked) {
+                            // updateRecord(uiState.record.copy(genitalia = null))
                         }
                     },
-                    modifier = Modifier.weight(1f),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    label = "Possui genitália",
+                    hasGenitalia
                 )
-                OutlinedTextField(
-                    label = { Text(text = "Largura (cm)") },
-                    value = uiState.record.width.toString(),
-                    onValueChange = { updateRecord(uiState.record.copy(width = it.toOnlyFloat())) },
-                    modifier = Modifier.weight(1f),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                )
-            }
-            Row(Modifier.fillMaxWidth()) {
-                OutlinedTextField(
-                    label = { Text(text = "Altura (cm)") },
-                    value = uiState.record.height.toString(),
-                    onValueChange = { updateRecord(uiState.record.copy(height = it.toOnlyFloat())) },
-                    modifier = Modifier.weight(1f),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                )
-                OutlinedTextField(
-                    label = { Text(text = "Peso (kg)") },
-                    value = uiState.record.weight.toString(),
-                    onValueChange = { updateRecord(uiState.record.copy(weight = it.toOnlyFloat())) },
-                    modifier = Modifier.weight(1f),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                )
-            }
-        }
-    }
-    Session(title = "Tipologia") {
-        SubSession(title = "Tipo") {
-            CustomDropdown(
-                title = "Tipo",
-                list = formTypes,
-                selectedState = uiState.record.formType,
-                onSelect = { updateRecord(uiState.record.copy(formType = it)) })
-        }
-        SubSession(title = "Condição") {
-            CustomDropdown(
-                title = "Condição",
-                list = formCondition,
-                selectedState = uiState.record.formCondition,
-                onSelect = { updateRecord(uiState.record.copy(formCondition = it)) })
-        }
-        SubSession(title = "Forma geral do Corpo") {
+                if (hasGenitalia) {
 
-            CustomDropdown(
-                title = "Forma geral do Corpo",
-                list = formGeneralBodyShape,
-                selectedState = uiState.record.formGeneralBodyShape,
-                onSelect = { updateRecord(uiState.record.copy(formGeneralBodyShape = it)) })
-        }
-    }
-    Session(title = "Morfologia") {
-        SubSession(title = "Membros superiores") {
-            ListCheckbox(
-                list = upperLimbs,
-                uiState.record.upperLimbs
-            ) { selected, _ -> updateRecord(uiState.record.copy(upperLimbs = selected)) }
-        }
-        SubSession(title = "Membros inferiores") {
-            ListCheckbox(
-                list = lowerLimbs,
-                uiState.record.lowerLimbs
-            ) { selected, _ -> updateRecord(uiState.record.copy(lowerLimbs = selected)) }
-        }
-        SubSession(title = "Fabricação de genitália") {
-            var hasGenitalia by remember {
-                mutableStateOf(false)
-            }
-            TextCheckbox(
-                onCheckedChange = { checked ->
-                    hasGenitalia = checked
-                    if (!checked) {
-                        updateRecord(uiState.record.copy(genitalia = null))
+                    TextRadioButton(
+                        Genitalia.entries,
+                        uiState.genitalia
+                    ) {
+                        updateRecord(uiState.copy(genitalia = it))
                     }
-                },
-                label = "Possui genitália",
-                hasGenitalia
-            )
-            if (hasGenitalia) {
-
-                TextRadioButton(
-                    listOf("Masculina", "Feminina"),
-                    uiState.record.genitalia
-                ) { updateRecord(uiState.record.copy(genitalia = it)) }
+                }
             }
-        }
-        SubSession(title = "Posição corporal") {
-            ListCheckbox(list = bodyPosition, uiState.record.bodyPosition) { selected, _ ->
-                updateRecord(uiState.record.copy(bodyPosition = selected))
+            SubSession(title = "Posição corporal") {
+                ListCheckbox(list = BodyPosition.entries, uiState.bodyPosition) { selected, _ ->
+                    updateRecord(uiState.copy(bodyPosition = selected))
+                }
             }
-        }
-        SubSession(title = "Outros atributos formais") {
-            ListCheckbox(
-                list = otherFormalAttributes,
-                uiState.record.otherFormalAttributes
-            ) { selected, _ ->
-                updateRecord(uiState.record.copy(otherFormalAttributes = selected))
-
-            }
-        }
-    }
-    Session(title = "Tecnologia") {
-        SubSession(title = "Queima") {
-            ListCheckbox(list = burn, uiState.record.burn) { selected, _ ->
-                updateRecord(uiState.record.copy(burn = selected))
-
-            }
-        }
-        SubSession(title = "Antiplástico") {
-            ListCheckbox(list = antiplastic, uiState.record.antiplastic) { selected, _ ->
-                updateRecord(uiState.record.copy(antiplastic = selected))
-
-            }
-        }
-        SubSession(title = "Técnica de fabricação") {
-            ListCheckbox(
-                list = fabricationTechnique,
-                uiState.record.fabricationTechnique
-            ) { selected, _ ->
-                updateRecord(uiState.record.copy(fabricationTechnique = selected))
-
-            }
-        }
-        SubSession(title = "Marcas de fabricação") {
-            ListCheckbox(
-                list = fabricationMarks,
-                uiState.record.fabricationMarks
-            ) { selected, _ ->
-                updateRecord(uiState.record.copy(fabricationMarks = selected))
-
-            }
-        }
-        SubSession(title = "Marcas de uso") {
-            ListCheckbox(list = usageMarks, uiState.record.usageMarks) { selected, _ ->
-                updateRecord(uiState.record.copy(usageMarks = selected))
-
-            }
-        }
-        SubSession(title = "Tratamento de SUP. (I.T.)") {
-            ListCheckbox(
-                list = surfaceTreatment,
-                uiState.record.surfaceTreatment
-            ) { selected, _ ->
-                updateRecord(uiState.record.copy(surfaceTreatment = selected))
-
-            }
-        }
-        SubSession(title = "Tratamento de SUP. (E.T.)") {
-            ListCheckbox(
-                list = surfaceTreatmentET,
-                uiState.record.surfaceTreatmentET
-            ) { selected, _ ->
-                updateRecord(uiState.record.copy(surfaceTreatmentET = selected))
-
-            }
-        }
-    }
-    Session(title = "Decoraçao") {
-        TextCheckbox(
-            onCheckedChange = { hasSelected -> updateRecord(uiState.record.copy(decoration = hasSelected)) },
-            label = "Possui decoraçao",
-            uiState.record.decoration
-        )
-        if (uiState.record.decoration) {
-            SubSession(title = "Local") {
-                TextRadioButton(
-                    location,
-                    uiState.record.location
-                ) { updateRecord(uiState.record.copy(location = it)) }
-            }
-            SubSession(title = "Tipo de Decoraçao") {
+            SubSession(title = "Outros atributos formais") {
                 ListCheckbox(
-                    list = decorationType,
-                    uiState.record.decorationType
+                    //TODO adiconar os outros enums
+                    list = otherFormalAttributes,
+                    uiState.otherFormalAttributes
                 ) { selected, _ ->
-                    updateRecord(uiState.record.copy(decorationType = selected))
-
-                }
-            }
-            SubSession(title = "Cor da pintura (F.I.)") {
-                ListCheckbox(list = paintColorFI, uiState.record.paintColorFI) { selected, _ ->
-                    updateRecord(uiState.record.copy(paintColorFI = selected))
-
-                }
-            }
-            SubSession(title = "Cor da pintura (F.E.)") {
-                ListCheckbox(list = paintColorFI, uiState.record.paintColorFE) { selected, _ ->
-                    updateRecord(uiState.record.copy(paintColorFE = selected))
-
-                }
-            }
-            SubSession(title = "Decoração plástica") {
-                ListCheckbox(
-                    list = plasticDecoration,
-                    uiState.record.plasticDecoration
-                ) { selected, _ ->
-                    updateRecord(uiState.record.copy(plasticDecoration = selected))
+                    updateRecord(uiState.copy(otherFormalAttributes = selected))
 
                 }
             }
         }
     }
-    Session(title = "Usos") {
-        ListCheckbox(list = uses, uiState.record.uses) { selected, _ ->
-            updateRecord(uiState.record.copy(uses = selected))
+}
 
+@Composable
+private fun TopologySession(
+    uiState: CatalogRecordModel,
+    updateRecord: (CatalogRecordModel) -> Unit
+) {
+    var isOpen by remember {
+        mutableStateOf(false)
+    }
+    Session(title = "Tipologia", modifier = Modifier.clickable { isOpen = !isOpen }) {
+        if (isOpen) {
+            SubSession(title = "Tipo") {
+                CustomDropdown(
+                    title = "Tipo",
+                    list = StatueType.entries,
+                    selectedState = uiState.statueType,
+                    onSelect = {
+                        updateRecord(uiState.copy(statueType = it))
+                    })
+            }
+            SubSession(title = "Condição") {
+                CustomDropdown(
+                    title = "Condição",
+                    list = Condition.entries,
+                    selectedState = uiState.condition,
+                    onSelect = {
+                        updateRecord(uiState.copy(condition = it))
+                    })
+            }
+            SubSession(title = "Forma geral do Corpo") {
+                CustomDropdown(
+                    title = "Forma geral do Corpo",
+                    list = GeneralBodyShape.entries,
+                    selectedState = uiState.generalBodyShape,
+                    onSelect = {
+                        updateRecord(uiState.copy(generalBodyShape = it))
+                    })
+            }
+        }
+    }
+}
+
+@Composable
+private fun DimensionSession(
+    uiState: CatalogRecordModel,
+    updateRecord: (CatalogRecordModel) -> Unit
+) {
+    var length by remember {
+        mutableStateOf(uiState.length?.toString() ?: "")
+    }
+    var width by remember {
+        mutableStateOf(uiState.width?.toString() ?: "")
+    }
+    var height by remember {
+        mutableStateOf(uiState.height?.toString() ?: "")
+    }
+    var weight by remember {
+        mutableStateOf(uiState.weight?.toString() ?: "")
+    }
+    var isOpen by remember {
+        mutableStateOf(false)
+    }
+    Session(title = "Dimensões", modifier = Modifier.clickable { isOpen = !isOpen }) {
+        if (isOpen) {
+            Column {
+                Row(Modifier.fillMaxWidth()) {
+                    OutlinedTextField(
+                        label = { Text(text = "Comprimento (cm)") },
+                        value = length,
+                        onValueChange = { newValue ->
+                            if (newValue.all { it.isDigit() }) {
+                                length = newValue
+                                updateRecord(uiState.copy(length = newValue.toOnlyFloat()))
+                            }
+                        },
+                        modifier = Modifier.weight(1f),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    )
+                    OutlinedTextField(
+                        label = { Text(text = "Largura (cm)") },
+                        value = width,
+                        onValueChange = { newValue ->
+                            if (newValue.all { it.isDigit() }) {
+                                width = newValue
+
+                                updateRecord(uiState.copy(width = newValue.toOnlyFloat()))
+                            }
+                        },
+                        modifier = Modifier.weight(1f),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    )
+                }
+                Row(Modifier.fillMaxWidth()) {
+                    OutlinedTextField(
+                        label = { Text(text = "Altura (cm)") },
+                        value = height,
+                        onValueChange = { newValue ->
+                            if (newValue.all { it.isDigit() }) {
+                                height = newValue
+                                updateRecord(uiState.copy(height = newValue.toOnlyFloat()))
+                            }
+                        },
+                        modifier = Modifier.weight(1f),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    )
+                    OutlinedTextField(
+                        label = { Text(text = "Peso (kg)") },
+                        value = weight,
+                        onValueChange = { newValue ->
+                            if (newValue.all { it.isDigit() }) {
+                                weight = newValue
+                                //updateRecord(uiState.record.copy(length = newValue.toOnlyFloat()))
+                            }
+                            //  updateRecord(uiState.record.copy(weight = it.toOnlyFloat()))
+                        },
+                        modifier = Modifier.weight(1f),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    )
+                }
+            }
         }
     }
 }
@@ -517,14 +666,21 @@ fun EditRecordPreview() {
 @Preview(showBackground = true)
 fun EditRecordFormPreview() {
     MaterialTheme {
-        EditRecordForm(uiState = object : SuccessUiState {
-            override val record: RecordModel
-                get() = RecordModel(0, listOf(), "8", "caboclo", "12", "2", "2")
-            override val isSynchronized: Boolean
-                get() = false
-            override val images: List<Bitmap>
-                get() = listOf()
-
-        }, {}, {})
+        EditRecordForm(uiState =
+        SuccessUiState(
+            record = CatalogRecordModel(
+                0,
+                listImages = listOf(),
+                "8",
+                "caboclo",
+                "12",
+                "2",
+                "2",
+                observations = ""
+            ),
+            isSynchronized = true,
+            images = listOf()
+        ), {}, {}
+        )
     }
 }

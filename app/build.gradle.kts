@@ -78,12 +78,15 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     annotationProcessor(libs.androidx.room.compiler)
 
+
     // To use Kotlin annotation processing tool (kapt)
     //noinspection KaptUsageInsteadOfKsp
     kapt(libs.androidx.room.compiler)
 
     // optional - Kotlin Extensions and Coroutines support for Room
     implementation(libs.androidx.room.ktx)
+    //serialization
+    implementation("com.google.code.gson:gson:2.11.0")
 }
 kapt {
     correctErrorTypes = true

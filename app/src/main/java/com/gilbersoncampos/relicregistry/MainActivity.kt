@@ -37,6 +37,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.gilbersoncampos.relicregistry.data.model.CatalogRecordModel
 import com.gilbersoncampos.relicregistry.data.model.RecordModel
 import com.gilbersoncampos.relicregistry.navigation.NavGraphHost
 import com.gilbersoncampos.relicregistry.screen.editRecord.navigateToEditRecord
@@ -68,16 +69,16 @@ class MainActivity : ComponentActivity() {
                 ) { innerPadding ->
                     if (showPopUp) {
                         Popup(onCreate = { numbering, place, shelf, group ->
-                            val initialRecord = RecordModel(
+                            val initialRecord = CatalogRecordModel(
                                 0,
-                                numbering = numbering,
-                                place = place,
-                                shelf = shelf,
+                                identification = numbering,
+                                archaeologicalSite = place,
+                                shelfLocation = shelf,
                                 group = group,
-                                box = ""
+                                observations = "",
+                                classification = ""
                             )
-                            viewModel.createRecord(initialRecord) {
-                                id->
+                            viewModel.createRecord(initialRecord) { id ->
                                 navController.navigateToEditRecord(id)
                                 showPopUp = false
                             }
@@ -94,6 +95,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
 @Composable
 fun Popup(
     onCreate: (String, String, String, String) -> Unit,
