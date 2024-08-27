@@ -3,6 +3,7 @@ package com.gilbersoncampos.relicregistry.screen.editRecord
 import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -28,13 +29,16 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -113,7 +117,11 @@ import com.gilbersoncampos.relicregistry.ui.components.TextRadioButton
 import kotlin.math.round
 
 @Composable
-fun EditRecord(idRecord: Long, viewModel: EditRecordViewModel = hiltViewModel()) {
+fun EditRecord(
+    idRecord: Long,
+    onBack: () -> Unit,
+    viewModel: EditRecordViewModel = hiltViewModel()
+) {
     val uiState = viewModel.uiState.collectAsState().value
     LaunchedEffect(idRecord) {
         viewModel.getRecord(idRecord)
@@ -122,7 +130,8 @@ fun EditRecord(idRecord: Long, viewModel: EditRecordViewModel = hiltViewModel())
         uiState = uiState,
         updateRecord = viewModel::updateUiState,
         saveRecord = viewModel::saveRecord,
-        saveImages = viewModel::saveImages
+        saveImages = viewModel::saveImages,
+        onBack = onBack
 
     )
 }
@@ -133,13 +142,21 @@ fun EditRecordUi(
     uiState: EditRecordUiState,
     updateRecord: (CatalogRecordModel) -> Unit,
     saveRecord: () -> Unit,
-    saveImages: (List<Uri>) -> Unit
+    saveImages: (List<Uri>) -> Unit,
+    onBack: () -> Unit
 ) {
 
 
     when (uiState) {
         is EditRecordUiState.Error -> Text(text = uiState.message)
-        EditRecordUiState.Loading -> Text(text = "Carregando")
+        EditRecordUiState.Loading -> Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            CircularProgressIndicator()
+        }
+
         is EditRecordUiState.Success -> Column {
             TopAppBar(
                 title = { Text(text = "Ficha: ${uiState.state.record.identification}") },
@@ -156,7 +173,7 @@ fun EditRecordUi(
 
                     }
                 })
-            EditRecordForm(uiState.state, updateRecord, saveImages)
+            EditRecordForm(uiState.state, updateRecord, saveImages, onBack)
         }
 
     }
@@ -167,8 +184,32 @@ fun EditRecordUi(
 fun EditRecordForm(
     uiState: SuccessUiState,
     updateRecord: (CatalogRecordModel) -> Unit,
-    saveImages: (List<Uri>) -> Unit
+    saveImages: (List<Uri>) -> Unit,
+    onBack: () -> Unit
 ) {
+    var showDialog by remember { mutableStateOf(false) }
+    BackHandler(enabled = !uiState.isSynchronized) {
+        showDialog = true
+    }
+    if (showDialog) {
+        AlertDialog(
+            title = { Text(text = "Ficha com alterações pendentes") },
+            text = { Text(text = "Deseja sair sem salvar as alterações?") },
+            onDismissRequest = { showDialog = false },
+            dismissButton = {
+                TextButton(onClick = { showDialog = false }) {
+                    Text(text = "Não")
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    showDialog = false
+                    onBack()
+                }) {
+                    Text(text = "Sim")
+                }
+            })
+    }
 
     var selectedImage by remember { mutableStateOf<Bitmap?>(null) }
     selectedImage?.let { bitmap ->
@@ -679,7 +720,8 @@ fun EditRecordPreview() {
         uiState = EditRecordUiState.Loading,
         updateRecord = { },
         saveRecord = {},
-        saveImages = {}
+        saveImages = {},
+        onBack = {}
     )
 }
 
@@ -701,7 +743,7 @@ fun EditRecordFormPreview() {
             ),
             isSynchronized = true,
             images = listOf()
-        ), {}, {}
+        ), {}, {}, {}
         )
     }
 }

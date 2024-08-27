@@ -11,12 +11,12 @@ import com.gilbersoncampos.relicregistry.screen.home.HomeScreen
 
 
 val ROUTE = Destination.EditRecord.route
-fun NavGraphBuilder.editRecordScreen() {
+fun NavGraphBuilder.editRecordScreen(onBack: () -> Unit) {
     composable(route = ROUTE, arguments  = listOf(navArgument("id_record") { type = NavType.StringType })) {
         backStackEntry ->
         val idBackStack=backStackEntry.arguments?.getString("id_record")
         val idRecord: Long = idBackStack?.toLong() ?: 0
-        EditRecord(idRecord = idRecord)
+        EditRecord(idRecord = idRecord, onBack = onBack)
     }
 }
 

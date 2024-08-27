@@ -1,5 +1,8 @@
 package com.gilbersoncampos.relicregistry.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.slideIn
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -12,9 +15,17 @@ import com.gilbersoncampos.relicregistry.screen.recordList.recordListScreen
 
 @Composable
 fun NavGraphHost(navHostController: NavHostController) {
-    NavHost(startDestination = Destination.ListRecord.route, navController = navHostController) {
+
+    NavHost(
+        enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Left) },
+        exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Left) },
+        popExitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Right) },
+        popEnterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Right) },
+        startDestination = Destination.ListRecord.route,
+        navController = navHostController
+    ) {
         homeScreen()
-        editRecordScreen()
-        recordListScreen(navigateToEditRecord = {navHostController.navigateToEditRecord(it)})
+        editRecordScreen(onBack = navHostController::navigateUp)
+        recordListScreen(navigateToEditRecord = { navHostController.navigateToEditRecord(it) })
     }
 }

@@ -36,9 +36,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.gilbersoncampos.relicregistry.data.model.CatalogRecordModel
 import com.gilbersoncampos.relicregistry.data.model.RecordModel
+import com.gilbersoncampos.relicregistry.navigation.Destination
 import com.gilbersoncampos.relicregistry.navigation.NavGraphHost
 import com.gilbersoncampos.relicregistry.screen.editRecord.navigateToEditRecord
 import com.gilbersoncampos.relicregistry.screen.home.navigateToHome
@@ -55,16 +57,20 @@ class MainActivity : ComponentActivity() {
                 val viewModel: MainViewModel = hiltViewModel()
                 var showPopUp by remember { mutableStateOf(false) }
                 val navController = rememberNavController()
+                val route = navController.currentBackStackEntryAsState().value?.destination?.route?:""
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
 
                     floatingActionButton = {
-                        FloatingActionButton(onClick = { showPopUp = true }) {
-                            Icon(
-                                imageVector = Icons.Default.Add,
-                                contentDescription = "Add new register"
-                            )
+                        if (route == Destination.ListRecord.route) {
+                            FloatingActionButton(onClick = { showPopUp = true }) {
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = "Add new register"
+                                )
+                            }
                         }
+
                     }
                 ) { innerPadding ->
                     if (showPopUp) {

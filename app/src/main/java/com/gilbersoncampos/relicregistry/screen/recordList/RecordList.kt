@@ -1,5 +1,6 @@
 package com.gilbersoncampos.relicregistry.screen.recordList
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -45,13 +46,13 @@ fun RecordListScreen(
     navigateToEditRecord: (Long) -> Unit
 ) {
     val uiState = viewModel.uiState.collectAsState().value
+
     RecordListUI(uiState, onSelectRecord = navigateToEditRecord)
+
 }
 
 @Composable
 fun RecordListUI(uiState: RecordUiState, onSelectRecord: (Long) -> Unit) {
-
-
     Column(modifier = Modifier.fillMaxSize()) {
         when (uiState) {
             RecordUiState.Error -> {
