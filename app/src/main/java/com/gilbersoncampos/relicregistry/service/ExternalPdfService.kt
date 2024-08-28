@@ -7,25 +7,62 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
 import android.os.Environment
+import com.gilbersoncampos.relicregistry.data.model.BodyPosition
 import com.gilbersoncampos.relicregistry.data.model.CatalogRecordModel
 import com.gilbersoncampos.relicregistry.data.services.PdfService
 import java.io.File
 import java.io.FileOutputStream
-class ExternalPdfService(private val context: Context): PdfService {
-    override fun generatePdf(record:CatalogRecordModel,listImages: List<Bitmap>) {
+
+class ExternalPdfService(private val context: Context) : PdfService {
+    override fun generatePdf(record: CatalogRecordModel, listImages: List<Bitmap>) {
         // Cria um novo documento PDF
         val pdfDocument = PdfDocument()
 
         // Cria uma página
-        val pageInfo = PdfDocument.PageInfo.Builder(842, 595, 1).create()
+        val paper = Paper.A4_Portrain
+        val pageInfo = PdfDocument.PageInfo.Builder(paper.width, paper.height, 1).create()
         val page = pdfDocument.startPage(pageInfo)
 
         // Desenhar no Canvas da página
         val canvas = page.canvas
-        val bitmap=createBitmap()
-        val scale=(500).toFloat()/(listImages[0].height).toFloat()
-        canvas.drawBitmap(resizeBitmap(listImages[0],(listImages[0].width*scale).toInt(),500),0f,0f,null)
-        //canvas.drawText("Numeração: ${record.identification}", 80f, 50f, android.graphics.Paint())
+        val scale = (500).toFloat() / (listImages[0].height).toFloat()
+        // canvas.drawBitmap(resizeBitmap(listImages[0],(listImages[0].width*scale).toInt(),500),0f,0f,null)
+        //firstLine
+        val margin = 21
+        val initBorderX = margin + 0f
+        val initBorderY = margin + 0f
+        val effectiveContentX = paper.width - 2 * margin
+        val effectiveContentY = paper.height - 2 * margin
+        val reasonX = effectiveContentX / 5
+        val reasonY = effectiveContentY / 2
+        canvas.drawText(
+            "Sítio arqueológico: ${record.archaeologicalSite}",
+            calculatePosition(initBorderX, reasonX, position = 0), initBorderY, Paint()
+        )
+        canvas.drawText(
+            "Identificação: ${record.identification}",
+            calculatePosition(initBorderX, reasonX, position = 1),
+            initBorderY,
+            Paint()
+        )
+        canvas.drawText(
+            "Classificação: ${record.identification}",
+            calculatePosition(initBorderX, reasonX, position = 2),
+            initBorderY,
+            Paint()
+        )
+        canvas.drawText(
+            "Localização Prateleira: ${record.shelfLocation}",
+            calculatePosition(initBorderX, reasonX, position = 3),
+            initBorderY,
+            Paint()
+        )
+        canvas.drawText(
+            "Grupo: ${record.group}",
+            calculatePosition(initBorderX, reasonX, position = 4),
+            initBorderY,
+            Paint()
+        )
 
         // Finaliza a página
         pdfDocument.finishPage(page)
@@ -39,10 +76,13 @@ class ExternalPdfService(private val context: Context): PdfService {
         } catch (e: Exception) {
             e.printStackTrace()
         }
-
         // Fecha o documento PDF
         pdfDocument.close()
     }
+
+    private fun calculatePosition(initBorderX: Float, reasonX: Int, position: Int) =
+        initBorderX + (reasonX * position)
+
     fun createBitmap(): Bitmap {
         val width = 500
         val height = 500
@@ -64,8 +104,19 @@ class ExternalPdfService(private val context: Context): PdfService {
 
         return bitmap
     }
+
     fun resizeBitmap(bitmap: Bitmap, newWidth: Int, newHeight: Int): Bitmap {
         return Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true)
     }
 
+}
+
+/**
+ * Classe que representa um papel
+ * @param width Largura do papel em PostScript
+ * @param height Altura do papel em PostScript
+ */
+sealed class Paper(val width: Int, val height: Int) {
+    data object A4 : Paper(595, 842)
+    data object A4_Portrain : Paper( 842,595)
 }
