@@ -8,6 +8,8 @@ import com.gilbersoncampos.relicregistry.data.model.CatalogRecordModel
 import com.gilbersoncampos.relicregistry.data.model.RecordModel
 import com.gilbersoncampos.relicregistry.data.repository.RecordRepository
 import com.gilbersoncampos.relicregistry.data.services.ImageStoreService
+import com.gilbersoncampos.relicregistry.data.services.PdfService
+import com.gilbersoncampos.relicregistry.service.ExternalPdfService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -23,14 +25,15 @@ import kotlin.coroutines.CoroutineContext
 @HiltViewModel
 class EditRecordViewModel @Inject constructor(
     private val repository: RecordRepository,
-    private val imageStoreService: ImageStoreService
+    private val imageStoreService: ImageStoreService,
+    private val pdfService: PdfService
 ) :
     ViewModel() {
     private val _uiState = MutableStateFlow<EditRecordUiState>(EditRecordUiState.Loading)
     val uiState: StateFlow<EditRecordUiState> = _uiState
     private lateinit var _savedRecord: CatalogRecordModel
 
-        fun getRecord(id: Long) {
+    fun getRecord(id: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.getRecordById(id).collectLatest { record ->
                 _savedRecord = record
@@ -44,10 +47,6 @@ class EditRecordViewModel @Inject constructor(
             }
         }
     }
-
-
-
-
     fun saveImages(uris: List<Uri>) {
         val imageNames: MutableList<String> = mutableListOf()
         val imagesBitmaps: MutableList<Bitmap> = mutableListOf()
@@ -63,17 +62,15 @@ class EditRecordViewModel @Inject constructor(
             updateUiState(record = (_uiState.value as EditRecordUiState.Success).state.record.copy(listImages = imageNames), images = imagesBitmaps)
         }
     }
-
     fun getImage(name: String): Bitmap {
         return imageStoreService.getImage(nameImage = name)
     }
-
     fun saveRecord() {
         viewModelScope.launch(Dispatchers.IO) {
             repository.updateRecord((_uiState.value as EditRecordUiState.Success).state.record)
         }
     }
-     fun updateUiState(record: CatalogRecordModel, images: List<Bitmap> = emptyList()) {
+    fun updateUiState(record: CatalogRecordModel, images: List<Bitmap> = emptyList()) {
         _uiState.value = EditRecordUiState.Success(
             SuccessUiState(
                 record = record,
@@ -81,6 +78,10 @@ class EditRecordViewModel @Inject constructor(
                 images = images.ifEmpty { (_uiState.value as? EditRecordUiState.Success)?.state?.images.orEmpty() }
             )
         )
+    }
+
+    fun generatePdf(){
+        pdfService.generatePdf(_savedRecord, listImages =(_uiState.value as? EditRecordUiState.Success)?.state?.images?: listOf())
     }
 
 }

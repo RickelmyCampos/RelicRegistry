@@ -1,5 +1,7 @@
 package com.gilbersoncampos.relicregistry.screen.recordList
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -30,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -47,12 +50,12 @@ fun RecordListScreen(
 ) {
     val uiState = viewModel.uiState.collectAsState().value
 
-    RecordListUI(uiState, onSelectRecord = navigateToEditRecord)
+    RecordListUI(uiState, onSelectRecord = navigateToEditRecord,getBitmap=viewModel::getImage)
 
 }
 
 @Composable
-fun RecordListUI(uiState: RecordUiState, onSelectRecord: (Long) -> Unit) {
+fun RecordListUI(uiState: RecordUiState, onSelectRecord: (Long) -> Unit,getBitmap:(String)->Bitmap) {
     Column(modifier = Modifier.fillMaxSize()) {
         when (uiState) {
             RecordUiState.Error -> {
@@ -72,7 +75,7 @@ fun RecordListUI(uiState: RecordUiState, onSelectRecord: (Long) -> Unit) {
             is RecordUiState.Success -> {
                 if (uiState.records.isEmpty()) {
                     Column(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier.fillMaxSize().padding(16.dp),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -81,7 +84,7 @@ fun RecordListUI(uiState: RecordUiState, onSelectRecord: (Long) -> Unit) {
                 } else {
                     LazyColumn {
                         items(uiState.records) {
-                            RelicItem(it) {
+                            RelicItem(it,getBitmap=getBitmap) {
                                 onSelectRecord(it.id)
                             }
                         }
@@ -95,18 +98,28 @@ fun RecordListUI(uiState: RecordUiState, onSelectRecord: (Long) -> Unit) {
 }
 
 @Composable
-private fun RelicItem(relic: CatalogRecordModel, onClick: () -> Unit) {
+private fun RelicItem(relic: CatalogRecordModel, getBitmap: (String) -> Bitmap, onClick: () -> Unit) {
     Row(modifier = Modifier
         .fillMaxWidth()
         .clickable { onClick() }
         .padding(6.dp)) {
-        Image(
-            painter = painterResource(id = R.drawable.ic_image_basic),
-            contentDescription = "image relic",
-            modifier = Modifier
-                .size(50.dp)
-                .background(Color.Gray)
-        )
+        if (relic.listImages.isEmpty()){
+            Image(
+                painter = painterResource(id = R.drawable.ic_image_basic),
+                contentDescription = "image relic",
+                modifier = Modifier
+                    .size(50.dp)
+                    .background(Color.Gray)
+            )
+        }else{
+            Image(
+                bitmap = getBitmap(relic.listImages[0]).asImageBitmap(),
+                contentDescription = "image relic",
+                modifier = Modifier
+                    .size(50.dp)
+                    .background(Color.Gray) )
+        }
+
         Spacer(modifier = Modifier.width(4.dp))
         Column {
             Text(text = relic.identification, style = MaterialTheme.typography.titleLarge)
@@ -119,6 +132,6 @@ private fun RelicItem(relic: CatalogRecordModel, onClick: () -> Unit) {
 @Composable
 fun RecordListUIPreview() {
     RelicRegistryTheme {
-        RecordListUI(RecordUiState.Loading) {}
+        RecordListUI(RecordUiState.Loading,{},{BitmapFactory.decodeFile("")})
     }
 }

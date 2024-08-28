@@ -56,6 +56,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -131,7 +132,8 @@ fun EditRecord(
         updateRecord = viewModel::updateUiState,
         saveRecord = viewModel::saveRecord,
         saveImages = viewModel::saveImages,
-        onBack = onBack
+        onBack = onBack,
+        generatePdf = viewModel::generatePdf
 
     )
 }
@@ -142,7 +144,7 @@ fun EditRecordUi(
     uiState: EditRecordUiState,
     updateRecord: (CatalogRecordModel) -> Unit,
     saveRecord: () -> Unit,
-    saveImages: (List<Uri>) -> Unit,
+    saveImages: (List<Uri>) -> Unit, generatePdf: () -> Unit,
     onBack: () -> Unit
 ) {
 
@@ -173,7 +175,13 @@ fun EditRecordUi(
 
                     }
                 })
-            EditRecordForm(uiState.state, updateRecord, saveImages, onBack)
+            EditRecordForm(
+                uiState = uiState.state,
+                updateRecord = updateRecord,
+                saveImages = saveImages,
+                onBack=onBack,
+                generatePdf = generatePdf
+            )
         }
 
     }
@@ -185,6 +193,7 @@ fun EditRecordForm(
     uiState: SuccessUiState,
     updateRecord: (CatalogRecordModel) -> Unit,
     saveImages: (List<Uri>) -> Unit,
+    generatePdf: () -> Unit,
     onBack: () -> Unit
 ) {
     var showDialog by remember { mutableStateOf(false) }
@@ -220,15 +229,36 @@ fun EditRecordForm(
             .fillMaxSize()
     ) {
         item {
-            ImageCarrousel(
-                uiState.images,
-                modifier = Modifier
-                    .padding(16.dp)
-                    .height(200.dp)
-                    .border(0.dp, Color.Black, shape = RoundedCornerShape(12.dp))
-                    .background(Color.Black, shape = RoundedCornerShape(12.dp))
+            if (uiState.images.isNotEmpty()) {
+                ImageCarrousel(
+                    uiState.images,
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .height(200.dp)
+                        .border(0.dp, Color.Black, shape = RoundedCornerShape(12.dp))
+                        .background(Color.Black, shape = RoundedCornerShape(12.dp))
 
-            ) { selectedImage = it }
+                ) { selectedImage = it }
+            } else {
+                Column(
+                    Modifier
+                        .height(200.dp)
+                        .padding(16.dp)
+                        .background(
+                            Color.Gray,
+                            RoundedCornerShape(12.dp)
+                        )
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_image_basic),
+                        contentDescription = "", modifier = Modifier.size(50.dp), tint = Color.White
+                    )
+                }
+            }
+
 
             val pickerMedia =
                 rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(5)) { uris ->
@@ -239,8 +269,14 @@ fun EditRecordForm(
                         Log.d("PhotoPicker", "No media selected")
                     }
                 }
-            Button(onClick = { pickerMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) }) {
-                Text(text = "Selecionar fotos")
+            Row {
+
+                Button(onClick = { pickerMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) }) {
+                    Text(text = "Selecionar fotos")
+                }
+                Button(onClick = generatePdf) {
+                    Text(text = "Gerar Pdf")
+                }
             }
             Sessions(uiState, updateRecord)
         }
@@ -721,7 +757,8 @@ fun EditRecordPreview() {
         updateRecord = { },
         saveRecord = {},
         saveImages = {},
-        onBack = {}
+        onBack = {},
+        generatePdf = {}
     )
 }
 
@@ -743,7 +780,7 @@ fun EditRecordFormPreview() {
             ),
             isSynchronized = true,
             images = listOf()
-        ), {}, {}, {}
+        ), {}, {}, {}, {}
         )
     }
 }
