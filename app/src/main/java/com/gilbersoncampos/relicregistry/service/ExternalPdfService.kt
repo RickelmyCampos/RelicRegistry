@@ -5,13 +5,20 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.RectF
 import android.graphics.pdf.PdfDocument
+import android.icu.text.CaseMap.Title
 import android.os.Environment
 import com.gilbersoncampos.relicregistry.data.model.BodyPosition
 import com.gilbersoncampos.relicregistry.data.model.CatalogRecordModel
+import com.gilbersoncampos.relicregistry.data.model.Condition
+import com.gilbersoncampos.relicregistry.data.model.GeneralBodyShape
+import com.gilbersoncampos.relicregistry.data.model.StatueType
+import com.gilbersoncampos.relicregistry.data.model.UpperLimbs
 import com.gilbersoncampos.relicregistry.data.services.PdfService
 import java.io.File
 import java.io.FileOutputStream
+import kotlin.enums.EnumEntries
 
 class ExternalPdfService(private val context: Context) : PdfService {
     override fun generatePdf(record: CatalogRecordModel, listImages: List<Bitmap>) {
@@ -47,6 +54,9 @@ class ExternalPdfService(private val context: Context) : PdfService {
 
     private fun calculatePosition(initBorderX: Float, reasonX: Int, position: Int) =
         initBorderX + (reasonX * position)
+
+    private fun calculateYPosition(initY: Float, position: Int, textSize: Float, spacer: Float) =
+        initY + (position * (textSize + spacer))
 
     fun createBitmap(): Bitmap {
         val width = 500
@@ -86,39 +96,182 @@ class ExternalPdfService(private val context: Context) : PdfService {
         val margin = 21
         val initBorderX = margin + 0f
         val initBorderY = margin + 0f
-        val effectiveContentX = page.info.pageWidth - 2 * margin
-        val effectiveContentY = page.info.pageHeight - 2 * margin
-        val reasonX = effectiveContentX / 5
-        val reasonY = effectiveContentY / 2
+        val textSize = 12f
+        val spacer = 1.5f
+        val paint = Paint().apply {
+            color = Color.BLACK
+            style = Paint.Style.FILL
+            this.textSize = textSize
+        }
+        val paintRect = Paint().apply {
+            color = Color.BLACK
+            style = Paint.Style.STROKE
+            strokeWidth = 1f
+        }
+        //Start Header
+        //Rectangle Header
+        canvas.drawRect(
+            RectF(
+                initBorderX - 2f,
+                initBorderY - textSize - 2f,
+                page.info.pageWidth - 2f,
+                calculateYPosition(initBorderY, 4, textSize, spacer) + 2f
+            ), paintRect
+        )
+
         canvas.drawText(
             "Sítio arqueológico: ${record.archaeologicalSite}",
-            calculatePosition(initBorderX, reasonX, position = 0), initBorderY, Paint()
+            initBorderX, calculateYPosition(initBorderY, 0, textSize, spacer), paint
         )
         canvas.drawText(
             "Identificação: ${record.identification}",
-            calculatePosition(initBorderX, reasonX, position = 1),
-            initBorderY,
-            Paint()
+            initBorderX, calculateYPosition(initBorderY, 1, textSize, spacer), paint
         )
         canvas.drawText(
-            "Classificação: ${record.identification}",
-            calculatePosition(initBorderX, reasonX, position = 2),
-            initBorderY,
-            Paint()
+            "Classificação: ${record.classification}",
+            initBorderX, calculateYPosition(initBorderY, 2, textSize, spacer), paint
         )
         canvas.drawText(
             "Localização Prateleira: ${record.shelfLocation}",
-            calculatePosition(initBorderX, reasonX, position = 3),
-            initBorderY,
-            Paint()
+            initBorderX, calculateYPosition(initBorderY, 3, textSize, spacer), paint
         )
         canvas.drawText(
-            "Grupo 2: ${record.group}",
-            calculatePosition(initBorderX, reasonX, position = 4),
-            initBorderY,
-            Paint()
+            "Grupo: ${record.group}",
+            initBorderX, calculateYPosition(initBorderY, 4, textSize, spacer), paint
+        )
+        //End Header
+
+        //Start Body
+        //Rectangle Body
+        val yBodyInitPosition =
+            calculateYPosition(initBorderY, 4, textSize, spacer) + textSize + 10f
+        canvas.drawRect(
+            RectF(
+                initBorderX - 2f,
+                yBodyInitPosition - 2f - textSize,
+                page.info.pageWidth - 2f,
+                page.info.pageHeight - 2f
+            ), paintRect
+        )
+        generateOptions(
+            "Artefato",
+            canvas,
+            initBorderX,
+            yBodyInitPosition,
+            textSize,
+            spacer,
+            paint,
+            paintRect,
+            StatueType.entries,
+            record.statueType?.let { listOf(it) } ?: emptyList()
+        )
+        generateOptions(
+            "Condição",
+            canvas,
+            initBorderX,
+            calculateYPosition(yBodyInitPosition, StatueType.entries.count()+1, textSize, spacer),
+            textSize,
+            spacer,
+            paint,
+            paintRect,
+            Condition.entries,
+            record.condition?.let { listOf(it) } ?: emptyList()
+        )
+        generateOptions(
+            "Forma Geral do Corpo",
+            canvas,
+            initBorderX,
+            calculateYPosition(yBodyInitPosition, StatueType.entries.count()+Condition.entries.count()+2, textSize, spacer),
+            textSize,
+            spacer,
+            paint,
+            paintRect,
+            GeneralBodyShape.entries,
+            record.generalBodyShape?.let { listOf(it) } ?: emptyList()
+        )
+        generateOptions(
+            "Membros Superiores",
+            canvas,
+            initBorderX,
+            calculateYPosition(yBodyInitPosition, StatueType.entries.count()+Condition.entries.count()+GeneralBodyShape.entries.count()+3, textSize, spacer),
+            textSize,
+            spacer,
+            paint,
+            paintRect,
+            UpperLimbs.entries,
+            record.upperLimbs
         )
 
+
+        //End Body
+    }
+
+    private fun <T : Enum<T>> generateOptions(
+        title: String,
+        canvas: Canvas,
+        initBorderX: Float,
+        yBodyInitPosition: Float,
+        textSize: Float,
+        spacer: Float,
+        paint: Paint,
+        paintRect: Paint,
+        options: List<T>,
+        listSelectedOptions: List<T>
+    ) {
+
+        canvas.drawText(
+            title,
+            initBorderX, calculateYPosition(yBodyInitPosition, 0, textSize, spacer), paint
+        )
+
+        val yInitPositionCheckOptions = calculateYPosition(yBodyInitPosition, 1, textSize, spacer)
+        for (i in options.indices) {
+            val recInitX = initBorderX
+            val recInitY = calculateYPosition(
+                yInitPositionCheckOptions,
+                i,
+                textSize,
+                spacer
+            ) - textSize + 2f
+            val recEndX = initBorderX + 10f
+            val recEndY = calculateYPosition(
+                yInitPositionCheckOptions,
+                i,
+                textSize,
+                spacer
+            ) - textSize + 12f
+
+            if (listSelectedOptions.contains(options[i])) {
+                //floatArray(x,y,endx,endy)
+                val crossFloatArray = floatArrayOf(
+                    recInitX,
+                    recInitY,
+                    recEndX,
+                    recEndY,
+                    recEndX,
+                    recInitY,
+                    recInitX,
+                    recEndY
+                )
+                canvas.drawLines(
+                    crossFloatArray, paint
+                )
+            }
+            canvas.drawRect(
+                RectF(
+                    recInitX,
+                    recInitY,
+                    recEndX,
+                    recEndY
+                ), paintRect
+            )
+            canvas.drawText(
+                options[i].name,
+                initBorderX + 12f,
+                calculateYPosition(yInitPositionCheckOptions, i, textSize, spacer),
+                paint
+            )
+        }
     }
 }
 

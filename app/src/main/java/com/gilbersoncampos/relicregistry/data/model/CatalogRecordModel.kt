@@ -1,7 +1,7 @@
 package com.gilbersoncampos.relicregistry.data.model
 
 data class CatalogRecordModel(
-    val id:Long,
+    val id: Long,
     val listImages: List<String> = listOf(),
     val archaeologicalSite: String,
     val identification: String,
@@ -9,19 +9,19 @@ data class CatalogRecordModel(
     val shelfLocation: String,
     val group: String,
     // Typology
-    val statueType: StatueType?=null,
-    val condition: Condition?=null,
-    val generalBodyShape: GeneralBodyShape?=null,
+    val statueType: StatueType? = null,
+    val condition: Condition? = null,
+    val generalBodyShape: GeneralBodyShape? = null,
     // Portions
     val upperLimbs: List<UpperLimbs> = listOf(),
     val lowerLimbs: List<LowerLimbs> = listOf(),
     // Genitalia
-    val genitalia: Genitalia?=null,
+    val genitalia: Genitalia? = null,
     // Dimensions
-    val length: Float?=null,
-    val width: Float?=null,
-    val height: Float?=null,
-    val weight: Float?=null,
+    val length: Float? = null,
+    val width: Float? = null,
+    val height: Float? = null,
+    val weight: Float? = null,
     // Technology
     val firing: List<Firing> = listOf(),
     val temper: List<Temper> = listOf(),
@@ -31,7 +31,7 @@ data class CatalogRecordModel(
     val surfaceTreatmentInternal: List<SurfaceTreatment> = listOf(),
     val surfaceTreatmentExternal: List<SurfaceTreatment> = listOf(),
     // Decoration
-    val decorationLocation: DecorationLocation?=null,
+    val decorationLocation: DecorationLocation? = null,
     val decorationType: List<DecorationType> = listOf(),
     val internalPaintColor: List<PaintColor> = listOf(),
     val externalPaintColor: List<PaintColor> = listOf(),
@@ -51,9 +51,10 @@ data class CatalogRecordModel(
 
 enum class StatueType { ANTHROPOMORPHIC, ZOOMORPHIC, ANTHROPOZOOMORPHIC, HEAD, BODY, OTHER }
 enum class Condition { INTACT, FRAGMENTED, RECONSTITUTED }
-enum class GeneralBodyShape { CYLINDRICAL, GLOBULAR, PHALLIC }
-enum class UpperLimbs { HEAD, EYES, NOSE, EARS, MOUTH, NECK, SHOULDERS, CHEST, BREASTS, ARMS, HANDS, FINGERS, NAVEL, LEGS, FEET, ANUS, BUTTOCKS }
-enum class LowerLimbs { HEAD, EYES, NOSE, EARS, MOUTH, NECK, SHOULDERS, CHEST, BREASTS, ARMS, HANDS, FINGERS, NAVEL, LEGS, FEET, ANUS, BUTTOCKS }
+enum class GeneralBodyShape { SOLID, HOLLOW, NATURALISTIC, STYLIZED, CYLINDRICAL, GLOBULAR, TRAPEZOIDAL, PHALLIC }
+
+enum class UpperLimbs { HEAD, EYES, NOSE, EARS, MOUTH, NECK, SHOULDERS, CHEST, BREASTS, ARMS, HANDS, FINGERS, NAVEL, }
+enum class LowerLimbs { BUTTOCKS, ANUS, LEGS, FEET, TOES }
 enum class Genitalia { MALE, FEMALE }
 enum class Firing { OXIDIZING, REDUCING, REDUCED_CORE, INTERNAL_OXIDIZING_EXTERNAL_REDUCING, INTERNAL_REDUCING_EXTERNAL_OXIDIZING, UNIDENTIFIED }
 enum class Temper { MINERAL, QUARTZ, MICA, IRON_OXIDE, CHARCOAL, GROG, CARAIPE, SHELL, CAUIXI }
