@@ -1,5 +1,6 @@
 package com.gilbersoncampos.relicregistry.screen.editRecord
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
@@ -65,7 +66,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.SecureFlagPolicy
+import androidx.core.content.ContextCompat.startActivity
+import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.gilbersoncampos.relicregistry.BuildConfig
 import com.gilbersoncampos.relicregistry.Constants.antiplastic
 import com.gilbersoncampos.relicregistry.Constants.bodyPosition
 import com.gilbersoncampos.relicregistry.Constants.burn
@@ -124,6 +128,7 @@ fun EditRecord(
     viewModel: EditRecordViewModel = hiltViewModel()
 ) {
     val uiState = viewModel.uiState.collectAsState().value
+    val context = LocalContext.current
     LaunchedEffect(idRecord) {
         viewModel.getRecord(idRecord)
     }
@@ -133,7 +138,27 @@ fun EditRecord(
         saveRecord = viewModel::saveRecord,
         saveImages = viewModel::saveImages,
         onBack = onBack,
-        generatePdf = viewModel::generatePdf
+        generatePdf = {
+            viewModel.generatePdf()
+            val file = viewModel.getPDF()
+            val uri = FileProvider.getUriForFile(
+                context,
+                BuildConfig.APPLICATION_ID + ".provider", file
+            )
+            val target = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(uri, "application/pdf")
+                addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            Log.d("Activity", uri.toString())
+            val intent = Intent.createChooser(target, "Open Files")
+            try {
+                startActivity(context, intent, null)
+            } catch (e: Exception) {
+                Log.e("Activity", e.message.toString())
+            }
+        }
 
     )
 }
@@ -179,7 +204,7 @@ fun EditRecordUi(
                 uiState = uiState.state,
                 updateRecord = updateRecord,
                 saveImages = saveImages,
-                onBack=onBack,
+                onBack = onBack,
                 generatePdf = generatePdf
             )
         }

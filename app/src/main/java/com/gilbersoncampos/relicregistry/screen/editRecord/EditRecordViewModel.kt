@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.io.File
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
@@ -83,7 +84,9 @@ class EditRecordViewModel @Inject constructor(
     fun generatePdf(){
         pdfService.generatePdf(_savedRecord, listImages =(_uiState.value as? EditRecordUiState.Success)?.state?.images?: listOf())
     }
-
+    fun getPDF():File{
+       return pdfService.getPDF()
+    }
 }
 
 sealed class EditRecordUiState {

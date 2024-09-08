@@ -24,46 +24,7 @@ class ExternalPdfService(private val context: Context) : PdfService {
         val page = pdfDocument.startPage(pageInfo)
 
         // Desenhar no Canvas da página
-        val canvas = page.canvas
-        val scale = (500).toFloat() / (listImages[0].height).toFloat()
-        // canvas.drawBitmap(resizeBitmap(listImages[0],(listImages[0].width*scale).toInt(),500),0f,0f,null)
-        //firstLine
-        val margin = 21
-        val initBorderX = margin + 0f
-        val initBorderY = margin + 0f
-        val effectiveContentX = paper.width - 2 * margin
-        val effectiveContentY = paper.height - 2 * margin
-        val reasonX = effectiveContentX / 5
-        val reasonY = effectiveContentY / 2
-        canvas.drawText(
-            "Sítio arqueológico: ${record.archaeologicalSite}",
-            calculatePosition(initBorderX, reasonX, position = 0), initBorderY, Paint()
-        )
-        canvas.drawText(
-            "Identificação: ${record.identification}",
-            calculatePosition(initBorderX, reasonX, position = 1),
-            initBorderY,
-            Paint()
-        )
-        canvas.drawText(
-            "Classificação: ${record.identification}",
-            calculatePosition(initBorderX, reasonX, position = 2),
-            initBorderY,
-            Paint()
-        )
-        canvas.drawText(
-            "Localização Prateleira: ${record.shelfLocation}",
-            calculatePosition(initBorderX, reasonX, position = 3),
-            initBorderY,
-            Paint()
-        )
-        canvas.drawText(
-            "Grupo: ${record.group}",
-            calculatePosition(initBorderX, reasonX, position = 4),
-            initBorderY,
-            Paint()
-        )
-
+        GeneratePDFDefault(page, record, listImages)
         // Finaliza a página
         pdfDocument.finishPage(page)
 
@@ -78,6 +39,10 @@ class ExternalPdfService(private val context: Context) : PdfService {
         }
         // Fecha o documento PDF
         pdfDocument.close()
+    }
+
+    override fun getPDF(): File {
+        return File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "sample.pdf")
     }
 
     private fun calculatePosition(initBorderX: Float, reasonX: Int, position: Int) =
@@ -109,6 +74,52 @@ class ExternalPdfService(private val context: Context) : PdfService {
         return Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true)
     }
 
+    private fun GeneratePDFDefault(
+        page: PdfDocument.Page,
+        record: CatalogRecordModel,
+        listImages: List<Bitmap>
+    ) {
+        val canvas = page.canvas
+        val scale = (500).toFloat() / (listImages[0].height).toFloat()
+        // canvas.drawBitmap(resizeBitmap(listImages[0],(listImages[0].width*scale).toInt(),500),0f,0f,null)
+        //firstLine
+        val margin = 21
+        val initBorderX = margin + 0f
+        val initBorderY = margin + 0f
+        val effectiveContentX = page.info.pageWidth - 2 * margin
+        val effectiveContentY = page.info.pageHeight - 2 * margin
+        val reasonX = effectiveContentX / 5
+        val reasonY = effectiveContentY / 2
+        canvas.drawText(
+            "Sítio arqueológico: ${record.archaeologicalSite}",
+            calculatePosition(initBorderX, reasonX, position = 0), initBorderY, Paint()
+        )
+        canvas.drawText(
+            "Identificação: ${record.identification}",
+            calculatePosition(initBorderX, reasonX, position = 1),
+            initBorderY,
+            Paint()
+        )
+        canvas.drawText(
+            "Classificação: ${record.identification}",
+            calculatePosition(initBorderX, reasonX, position = 2),
+            initBorderY,
+            Paint()
+        )
+        canvas.drawText(
+            "Localização Prateleira: ${record.shelfLocation}",
+            calculatePosition(initBorderX, reasonX, position = 3),
+            initBorderY,
+            Paint()
+        )
+        canvas.drawText(
+            "Grupo 2: ${record.group}",
+            calculatePosition(initBorderX, reasonX, position = 4),
+            initBorderY,
+            Paint()
+        )
+
+    }
 }
 
 /**
@@ -118,5 +129,5 @@ class ExternalPdfService(private val context: Context) : PdfService {
  */
 sealed class Paper(val width: Int, val height: Int) {
     data object A4 : Paper(595, 842)
-    data object A4_Portrain : Paper( 842,595)
+    data object A4_Portrain : Paper(842, 595)
 }
