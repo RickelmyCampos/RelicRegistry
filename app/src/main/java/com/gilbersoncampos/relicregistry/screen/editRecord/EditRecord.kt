@@ -90,6 +90,7 @@ import com.gilbersoncampos.relicregistry.Constants.upperLimbs
 import com.gilbersoncampos.relicregistry.Constants.usageMarks
 import com.gilbersoncampos.relicregistry.Constants.uses
 import com.gilbersoncampos.relicregistry.R
+import com.gilbersoncampos.relicregistry.data.model.AccessoryType
 import com.gilbersoncampos.relicregistry.data.model.BodyPosition
 import com.gilbersoncampos.relicregistry.data.model.CatalogRecordModel
 import com.gilbersoncampos.relicregistry.data.model.Condition
@@ -109,6 +110,7 @@ import com.gilbersoncampos.relicregistry.data.model.SurfaceTreatment
 import com.gilbersoncampos.relicregistry.data.model.Temper
 import com.gilbersoncampos.relicregistry.data.model.UpperLimbs
 import com.gilbersoncampos.relicregistry.data.model.UsageMarks
+import com.gilbersoncampos.relicregistry.data.model.Uses
 import com.gilbersoncampos.relicregistry.extensions.hasOnlyNumber
 import com.gilbersoncampos.relicregistry.extensions.toOnlyFloat
 import com.gilbersoncampos.relicregistry.ui.components.Accordion
@@ -406,7 +408,7 @@ private fun UsesSession(uiState: CatalogRecordModel, updateRecord: (CatalogRecor
     ) {
         Column {
 
-            ListCheckbox(list = uses, uiState.uses) { selected, _ ->
+            ListCheckbox(list = Uses.entries, uiState.uses) { selected, _ ->
                 updateRecord(uiState.copy(uses = selected))
 
             }
@@ -612,7 +614,7 @@ private fun MorfologySession(
             SubSession(title = "Outros atributos formais") {
                 ListCheckbox(
                     //TODO adiconar os outros enums
-                    list = otherFormalAttributes,
+                    list = AccessoryType.entries,
                     uiState.otherFormalAttributes
                 ) { selected, _ ->
                     updateRecord(uiState.copy(otherFormalAttributes = selected))

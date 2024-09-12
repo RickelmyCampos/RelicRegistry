@@ -37,11 +37,11 @@ data class CatalogRecordModel(
     val externalPaintColor: List<PaintColor> = listOf(),
     val plasticDecoration: List<PlasticDecoration> = listOf(),
     // Other Formal Attributes
-    val otherFormalAttributes: List<String> = listOf(),
+    val otherFormalAttributes: List<AccessoryType> = listOf(),
     // Body Position
     val bodyPosition: List<BodyPosition> = listOf(),
     // Uses
-    val uses: List<String> = listOf(),
+    val uses: List<Uses> = listOf(),
     // Observations
     val observations: String,
     val hasDecoration: Boolean = false,
@@ -58,7 +58,7 @@ enum class LowerLimbs { BUTTOCKS, ANUS, LEGS, FEET, TOES }
 enum class Genitalia { MALE, FEMALE }
 enum class Firing { OXIDIZING, REDUCING, REDUCED_CORE, INTERNAL_OXIDIZING_EXTERNAL_REDUCING, INTERNAL_REDUCING_EXTERNAL_OXIDIZING, UNIDENTIFIED }
 enum class Temper { MINERAL, QUARTZ, MICA, IRON_OXIDE, CHARCOAL, GROG, CARAIPE, SHELL, CAUIXI }
-enum class ManufacturingTechnique { COIL_BUILDING, MODELING, SLAB_BUILDING, PIT_FINGER, MOLDING, NATURALISTIC, STYLIZED, TRAPEZOIDAL, HOLLOW, SOLID }
+enum class ManufacturingTechnique { COIL_BUILDING, MODELING, SLAB_BUILDING, PIT_FINGER, MOLDING }
 enum class ManufacturingMarks { IMPRESSIONS, FIRING_MARKS }
 enum class UsageMarks { CARBON_CRUST, SOOT, RESIN, SCRATCHES, NONE, OTHER }
 enum class SurfaceTreatment { SMOOTHED, POLISHED, BURNISHED, RESIN, BRUSHED, SLIP, BARBOTINE, NONE }
@@ -66,4 +66,6 @@ enum class DecorationLocation { EXTERNAL, INTERNAL, BOTH }
 enum class DecorationType { PAINTED, PLASTIC }
 enum class PaintColor { WHITE, BLACK, CREAM_BEIGE, OTHER, UNIDENTIFIED }
 enum class PlasticDecoration { INCISION, EXCISION, EYE_APPLIQUE, MAMIFORM_APPLIQUE, PUNCTATION, FINGERPRINT, PERFORATED_HOLE, NON_PERFORATED_HOLE, HANDLE, ENLARGED_LOBES, LOINCLOTH, GARMENTS, ORNAMENTS, DIADEMS, HAIRSTYLE, MASK, EMBLEMS }
+enum class AccessoryType { STRETCHED_LOBES, THONGS, CLOTHING, ORNAMENTS, DIADEMS, HAIRSTYLE, MASK, EMBLEMS }
 enum class BodyPosition { STANDING_FRONTAL, SQUATTING, STANDING_PROFILE, DUAL_PERSPECTIVE, RATTLE, AMULET, CONTAINER, PIPE, MUSICAL_INSTRUMENT, WEAPON, OTHER }
+enum class Uses { RATTLE, AMULET, CONTAINER, PIPE, INSTRUMENT, MUSICAL, WEAPON, OTHER, NOT_IDENTIFIED }

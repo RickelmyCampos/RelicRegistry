@@ -1,6 +1,7 @@
 package com.gilbersoncampos.relicregistry.data.mapper
 
 import com.gilbersoncampos.relicregistry.data.local.entity.CatalogRecordEntity
+import com.gilbersoncampos.relicregistry.data.model.AccessoryType
 import com.gilbersoncampos.relicregistry.data.model.BodyPosition
 import com.gilbersoncampos.relicregistry.data.model.CatalogRecordModel
 import com.gilbersoncampos.relicregistry.data.model.Condition
@@ -20,6 +21,7 @@ import com.gilbersoncampos.relicregistry.data.model.SurfaceTreatment
 import com.gilbersoncampos.relicregistry.data.model.Temper
 import com.gilbersoncampos.relicregistry.data.model.UpperLimbs
 import com.gilbersoncampos.relicregistry.data.model.UsageMarks
+import com.gilbersoncampos.relicregistry.data.model.Uses
 
 
 fun CatalogRecordEntity.toModel(): CatalogRecordModel {
@@ -72,7 +74,8 @@ fun CatalogRecordEntity.toModel(): CatalogRecordModel {
 
         // Decoration
         decorationLocation = this.decorationLocation?.let { DecorationLocation.valueOf(it) },
-        decorationType = this.decorationType.takeIf { it.isNotEmpty() }?.split(",")?.map { DecorationType.valueOf(it.trim()) }?: listOf(),
+        decorationType = this.decorationType.takeIf { it.isNotEmpty() }?.split(",")
+            ?.map { DecorationType.valueOf(it.trim()) } ?: listOf(),
         internalPaintColor = this.internalPaintColor.takeIf { it.isNotEmpty() }?.split(",")
             ?.map { PaintColor.valueOf(it.trim()) } ?: listOf(),
         externalPaintColor = this.externalPaintColor.takeIf { it.isNotEmpty() }?.split(",")
@@ -82,14 +85,15 @@ fun CatalogRecordEntity.toModel(): CatalogRecordModel {
 
         // Other Formal Attributes
         otherFormalAttributes = this.otherFormalAttributes.takeIf { it.isNotEmpty() }?.split(",")
-            ?.map { it.trim() } ?: listOf(),
+            ?.map { AccessoryType.valueOf(it.trim()) } ?: listOf(),
 
         // Body Position
         bodyPosition = this.bodyPosition.takeIf { it.isNotEmpty() }?.split(",")
             ?.map { BodyPosition.valueOf(it.trim()) } ?: listOf(),
 
         // Uses
-        uses = this.uses.takeIf { it.isNotEmpty() }?.split(",")?.map { it.trim() } ?: listOf(),
+        uses = this.uses.takeIf { it.isNotEmpty() }?.split(",")?.map { Uses.valueOf(it.trim()) }
+            ?: listOf(),
 
         // Observations
         observations = this.observations,
