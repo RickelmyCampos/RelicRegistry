@@ -30,8 +30,10 @@ import com.gilbersoncampos.relicregistry.data.model.UpperLimbs
 import com.gilbersoncampos.relicregistry.data.model.UsageMarks
 import com.gilbersoncampos.relicregistry.data.model.Uses
 import com.gilbersoncampos.relicregistry.data.services.PdfService
+import com.gilbersoncampos.relicregistry.extensions.getNameTranslated
 import java.io.File
 import java.io.FileOutputStream
+import kotlin.enums.EnumEntries
 
 class ExternalPdfService(private val context: Context) : PdfService {
     override fun generatePdf(record: CatalogRecordModel, listImages: List<Bitmap>) {
@@ -40,7 +42,7 @@ class ExternalPdfService(private val context: Context) : PdfService {
 
         // Cria uma página
         val paper = Paper.A4_Portrain
-        val page = generatePdf(paper, pdfDocument, record, listImages)
+        generatePdf(paper, pdfDocument, record, listImages)
         // Finaliza a página
         //pdfDocument.finishPage(page)
 
@@ -148,291 +150,230 @@ class ExternalPdfService(private val context: Context) : PdfService {
             ), paintRect
         )
         //ROW 1
+        val row1listOptions: List<Triple<String, EnumEntries<out Enum<*>>, List<Enum<*>>>> = listOf(
+            Triple(
+                "Artefato",
+                StatueType.entries,
+                record.statueType?.let { listOf(it) } ?: emptyList()
+            ),
+            Triple(
+                "Condição",
+                Condition.entries,
+                record.condition?.let { listOf(it) } ?: emptyList()
+            ),
+            Triple(
+                "Forma Geral do Corpo",
+                GeneralBodyShape.entries,
+                record.generalBodyShape?.let { listOf(it) } ?: emptyList()
+            ),
+            Triple("Membros Superiores", UpperLimbs.entries, record.upperLimbs),
+        )
 
-        generateOptions(
-            "Artefato",
+        generateRowByOptions(
+            row1listOptions,
             canvas,
             initBorderX,
             yBodyInitPosition,
             textSize,
             spacer,
             paint,
-            paintRect,
-            StatueType.entries,
-            record.statueType?.let { listOf(it) } ?: emptyList()
+            paintRect
         )
-        generateOptions(
-            "Condição",
-            canvas,
-            initBorderX,
-            calculateYPosition(yBodyInitPosition, StatueType.entries.count() + 1, textSize, spacer),
-            textSize,
-            spacer,
-            paint,
-            paintRect,
-            Condition.entries,
-            record.condition?.let { listOf(it) } ?: emptyList()
-        )
-        generateOptions(
-            "Forma Geral do Corpo",
-            canvas,
-            initBorderX,
-            calculateYPosition(
-                yBodyInitPosition,
-                StatueType.entries.count() + Condition.entries.count() + 2,
-                textSize,
-                spacer
-            ),
-            textSize,
-            spacer,
-            paint,
-            paintRect,
-            GeneralBodyShape.entries,
-            record.generalBodyShape?.let { listOf(it) } ?: emptyList()
-        )
-        generateOptions(
-            "Membros Superiores",
-            canvas,
-            initBorderX,
-            calculateYPosition(
-                yBodyInitPosition,
-                StatueType.entries.count() + Condition.entries.count() + GeneralBodyShape.entries.count() + 3,
-                textSize,
-                spacer
-            ),
-            textSize,
-            spacer,
-            paint,
-            paintRect,
-            UpperLimbs.entries,
-            record.upperLimbs
-        )
+
         //ROW 2
+       val row2listOptions : List<Triple<String, EnumEntries<out Enum<*>>, List<Enum<*>>>> = listOf(
+           Triple(
+               "Membros Inferiores",
+               LowerLimbs.entries,
+               record.lowerLimbs
+           ),
+           Triple(
+               "Fabricação de Genitália",
+               Genitalia.entries,
+               record.genitalia?.let { listOf(it) } ?: emptyList()
+           ),
+           Triple(
+               "Queima",
+               Firing.entries,
+               record.firing
+           ),
+           Triple("Antiplástico", Temper.entries,
+               record.temper),
+           Triple("Técnica de fabricação", ManufacturingTechnique.entries,
+               record.manufacturingTechnique),
+       )
         val row2xPosition = calculateXPosition(initBorderX, reasonX, 1)
-        generateOptions(
-            "Membros Inferiores",
+        generateRowByOptions(
+            row2listOptions,
             canvas,
             row2xPosition,
             yBodyInitPosition,
             textSize,
             spacer,
             paint,
-            paintRect,
-            LowerLimbs.entries,
-            record.lowerLimbs
-        )
-        generateOptions(
-            "Fabricação de Genitália",
-            canvas,
-            row2xPosition,
-            calculateYPosition(yBodyInitPosition, LowerLimbs.entries.count() + 1, textSize, spacer),
-            textSize,
-            spacer,
-            paint,
-            paintRect,
-            Genitalia.entries,
-            record.genitalia?.let { listOf(it) } ?: emptyList()
-        )
-        generateOptions(
-            "Queima",
-            canvas,
-            row2xPosition,
-            calculateYPosition(
-                yBodyInitPosition,
-                LowerLimbs.entries.count() + Genitalia.entries.count() + 2,
-                textSize,
-                spacer
-            ),
-            textSize,
-            spacer,
-            paint,
-            paintRect,
-            Firing.entries,
-            record.firing
-        )
-        generateOptions(
-            "Antiplástico",
-            canvas,
-            row2xPosition,
-            calculateYPosition(
-                yBodyInitPosition,
-                LowerLimbs.entries.count() + Genitalia.entries.count() + Firing.entries.count() + 3,
-                textSize,
-                spacer
-            ),
-            textSize,
-            spacer,
-            paint,
-            paintRect,
-            Temper.entries,
-            record.temper
-        )
-        generateOptions(
-            "Técnica de fabricação",
-            canvas,
-            row2xPosition,
-            calculateYPosition(
-                yBodyInitPosition,
-                LowerLimbs.entries.count() + Genitalia.entries.count() + Firing.entries.count() + Temper.entries.count() + 4,
-                textSize,
-                spacer
-            ),
-            textSize,
-            spacer,
-            paint,
-            paintRect,
-            ManufacturingTechnique.entries,
-            record.manufacturingTechnique
+            paintRect
         )
         //ROW 3
+        val row3listOptions : List<Triple<String, EnumEntries<out Enum<*>>, List<Enum<*>>>> = listOf(
+            Triple(
+                "Marcas de fabricação",
+                ManufacturingMarks.entries,
+                record.manufacturingMarks
+            ),
+            Triple(
+                "Marcas de Uso",
+                UsageMarks.entries,
+                record.usageMarks
+            ),
+            Triple(
+                "Tratamento de Sup. (I.T.)",
+                SurfaceTreatment.entries,
+                record.surfaceTreatmentInternal
+            ),
+            Triple("Tratamento de Sup. (E.T.)", SurfaceTreatment.entries,
+                record.surfaceTreatmentExternal),
+            Triple("Decoração", DecorationLocation.entries,
+                record.decorationLocation?.let { listOf(it) } ?: emptyList()),
+        )
         val row3xPosition = calculateXPosition(initBorderX, reasonX, 2)
-        generateOptions(
-            "Marcas de fabricação",
+        generateRowByOptions(
+            row3listOptions,
             canvas,
             row3xPosition,
             yBodyInitPosition,
             textSize,
             spacer,
             paint,
-            paintRect,
-            ManufacturingMarks.entries,
-            record.manufacturingMarks
-        )
-        generateOptions(
-            "Marcas de Uso",
-            canvas,
-            row3xPosition,
-            calculateYPosition(
-                yBodyInitPosition,
-                ManufacturingMarks.entries.count() + 1,
-                textSize,
-                spacer
-            ),
-            textSize,
-            spacer,
-            paint,
-            paintRect,
-            UsageMarks.entries,
-            record.usageMarks
-        )
-        generateOptions(
-            "Tratamento de Sup. (I.T.)",
-            canvas,
-            row3xPosition,
-            calculateYPosition(
-                yBodyInitPosition,
-                ManufacturingMarks.entries.count() + UsageMarks.entries.count() + 2,
-                textSize,
-                spacer
-            ),
-            textSize,
-            spacer,
-            paint,
-            paintRect,
-            SurfaceTreatment.entries,
-            record.surfaceTreatmentInternal
-        )
-        generateOptions(
-            "Tratamento de Sup. (E.T.)",
-            canvas,
-            row3xPosition,
-            calculateYPosition(
-                yBodyInitPosition,
-                ManufacturingMarks.entries.count() + UsageMarks.entries.count() + SurfaceTreatment.entries.count() + 3,
-                textSize,
-                spacer
-            ),
-            textSize,
-            spacer,
-            paint,
-            paintRect,
-            SurfaceTreatment.entries,
-            record.surfaceTreatmentExternal
-        )
-        generateOptions(
-            "Decoração",
-            canvas,
-            row3xPosition,
-            calculateYPosition(
-                yBodyInitPosition,
-                ManufacturingMarks.entries.count() + UsageMarks.entries.count() + SurfaceTreatment.entries.count() + SurfaceTreatment.entries.count() + 4,
-                textSize,
-                spacer
-            ),
-            textSize,
-            spacer,
-            paint,
-            paintRect,
-            DecorationLocation.entries,
-            record.decorationLocation?.let { listOf(it) } ?: emptyList()
+            paintRect
         )
         //ROW 4
+        val row4listOptions : List<Triple<String, EnumEntries<out Enum<*>>, List<Enum<*>>>> = listOf(
+            Triple(
+                "Tipo de decoração",
+                DecorationType.entries,
+                record.decorationType
+            ),
+            Triple(
+                "Cor da pintura (F.I)",
+                PaintColor.entries,
+                record.internalPaintColor
+            ),
+            Triple(
+                "Cor da pintura (F.E)",
+                PaintColor.entries,
+                record.externalPaintColor
+            ),
+            Triple("Decoração plástica", PlasticDecoration.entries,
+                record.plasticDecoration),
+        )
         val row4xPosition = calculateXPosition(initBorderX, reasonX, 3)
-        generateOptions(
-            "Tipo de decoração",
+        generateRowByOptions(
+            row4listOptions,
             canvas,
             row4xPosition,
             yBodyInitPosition,
             textSize,
             spacer,
             paint,
-            paintRect,
-            DecorationType.entries,
-            record.decorationType
+            paintRect
         )
-        generateOptions(
-            "Cor da pintura (F.I)",
-            canvas,
-            row4xPosition,
-            calculateYPosition(
-                yBodyInitPosition,
-                DecorationType.entries.count() + 1,
-                textSize,
-                spacer
-            ),
-            textSize,
-            spacer,
-            paint,
-            paintRect,
-            PaintColor.entries,
-            record.internalPaintColor
-        )
-        generateOptions(
-            "Cor da pintura (F.E)",
-            canvas,
-            row4xPosition,
-            calculateYPosition(
-                yBodyInitPosition,
-                DecorationType.entries.count() + PaintColor.entries.count() + 2,
-                textSize,
-                spacer
-            ),
-            textSize,
-            spacer,
-            paint,
-            paintRect,
-            PaintColor.entries,
-            record.externalPaintColor
-        )
-        generateOptions(
-            "Decoração plástica",
-            canvas,
-            row4xPosition,
-            calculateYPosition(
-                yBodyInitPosition,
-                DecorationType.entries.count() + PaintColor.entries.count() + PaintColor.entries.count() + 3,
-                textSize,
-                spacer
-            ),
-            textSize,
-            spacer,
-            paint,
-            paintRect,
-            PlasticDecoration.entries,
-            record.plasticDecoration
-        )
-
         //End Body
+    }
+
+    private fun generateRowByOptions(
+        listOptionsRow1: List<Triple<String, EnumEntries<out Enum<*>>, List<Enum<*>>>>,
+        canvas: Canvas,
+        initialPositionX: Float,
+        initialPositionY: Float,
+        textSize: Float,
+        spacer: Float,
+        paint: Paint,
+        paintRect: Paint
+    ) {
+        listOptionsRow1.forEachIndexed { index, option ->
+            val position = listOptionsRow1.foldIndexed(0) { i, acc, op ->
+                if (i < index) {
+                    acc + op.second.size
+                } else {
+                    acc
+                }
+            } + index + 1
+            generateOptionsTwo(
+                canvas,
+                option,
+                initialPositionX,
+                calculateYPosition(initialPositionY, position, textSize, spacer),
+                textSize,
+                spacer,
+                paint,
+                paintRect
+            )
+        }
+    }
+
+    private fun generateOptionsTwo(
+        canvas: Canvas,
+        option: Triple<String, EnumEntries<out Enum<*>>, List<Enum<*>>>,
+        initBorderX: Float,
+        yBodyInitPosition: Float,
+        textSize: Float,
+        spacer: Float,
+        paint: Paint,
+        paintRect: Paint
+    ) {
+        canvas.drawText(
+            option.first,
+            initBorderX, calculateYPosition(yBodyInitPosition, 0, textSize, spacer), paint
+        )
+        val yInitPositionCheckOptions = calculateYPosition(yBodyInitPosition, 1, textSize, spacer)
+        for (i in option.second.indices) {
+            val recInitX = initBorderX
+            val recInitY = calculateYPosition(
+                yInitPositionCheckOptions,
+                i,
+                textSize,
+                spacer
+            ) - textSize + 2f
+            val recEndX = initBorderX + 10f
+            val recEndY = calculateYPosition(
+                yInitPositionCheckOptions,
+                i,
+                textSize,
+                spacer
+            ) - textSize + 12f
+
+            if (option.third.contains(option.second[i])) {
+                //floatArray(x,y,endx,endy)
+                val crossFloatArray = floatArrayOf(
+                    recInitX,
+                    recInitY,
+                    recEndX,
+                    recEndY,
+                    recEndX,
+                    recInitY,
+                    recInitX,
+                    recEndY
+                )
+                canvas.drawLines(
+                    crossFloatArray, paint
+                )
+            }
+            canvas.drawRect(
+                RectF(
+                    recInitX,
+                    recInitY,
+                    recEndX,
+                    recEndY
+                ), paintRect
+            )
+
+            canvas.drawText(
+                option.second[i].getNameTranslated(),
+                initBorderX + 12f,
+                calculateYPosition(yInitPositionCheckOptions, i, textSize, spacer),
+                paint
+            )
+        }
     }
 
     private fun generatePDFPage2Default(
@@ -506,52 +447,36 @@ class ExternalPdfService(private val context: Context) : PdfService {
             ), paintRect
         )
         //ROW 1
-        generateOptions(
-            "Outros atributos formais",
-            canvas,
-            initBorderX,
-            calculateYPosition(yBodyInitPosition, 0, textSize, spacer),
-            textSize,
-            spacer,
-            paint,
-            paintRect,
-            AccessoryType.entries,
-            record.otherFormalAttributes
-        )
-        generateOptions(
-            "Posição corporal",
-            canvas,
-            initBorderX,
-            calculateYPosition(
-                yBodyInitPosition,
-                AccessoryType.entries.count() + 1,
-                textSize,
-                spacer
+        val row1listOptions : List<Triple<String, EnumEntries<out Enum<*>>, List<Enum<*>>>> = listOf(
+            Triple(
+                "Outros atributos formais",
+                AccessoryType.entries,
+                record.otherFormalAttributes
             ),
-            textSize,
-            spacer,
-            paint,
-            paintRect,
-            BodyPosition.entries,
-            record.bodyPosition
-        )
-        generateOptions(
-            "Usos",
-            canvas,
-            initBorderX,
-            calculateYPosition(
-                yBodyInitPosition,
-                AccessoryType.entries.count() + BodyPosition.entries.count() + 2,
-                textSize,
-                spacer
+            Triple(
+                "Posição corporal",
+                BodyPosition.entries,
+                record.bodyPosition
             ),
+            Triple(
+                "Usos",
+                Uses.entries,
+                record.uses
+            ),
+        )
+        val row1xPosition = initBorderX
+
+        generateRowByOptions(
+            row1listOptions,
+            canvas,
+            row1xPosition,
+            yBodyInitPosition,
             textSize,
             spacer,
             paint,
-            paintRect,
-            Uses.entries,
-            record.uses
+            paintRect
         )
+
         val row2xPosition = calculateXPosition(initBorderX, reasonX, 1)
         canvas.drawText(
             "Observações:",
@@ -617,7 +542,6 @@ class ExternalPdfService(private val context: Context) : PdfService {
 
     }
 
-
     override fun getPDF(): File {
         return File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "sample.pdf")
     }
@@ -627,100 +551,8 @@ class ExternalPdfService(private val context: Context) : PdfService {
 
     private fun calculateYPosition(initY: Float, position: Int, textSize: Float, spacer: Float) =
         initY + (position * (textSize + spacer))
-
-    fun createBitmap(): Bitmap {
-        val width = 500
-        val height = 500
-        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
-
-        canvas.drawColor(Color.WHITE)
-
-        val paint = Paint().apply {
-            color = Color.RED
-            style = Paint.Style.FILL
-            textSize = 50f
-        }
-
-        canvas.drawCircle(width / 2f, height / 2f, 100f, paint)
-
-        paint.color = Color.BLACK
-        canvas.drawText("Hello, Bitmap!", 100f, height - 100f, paint)
-
-        return bitmap
-    }
-
     fun resizeBitmap(bitmap: Bitmap, newWidth: Int, newHeight: Int): Bitmap {
         return Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true)
-    }
-
-
-    private fun <T : Enum<T>> generateOptions(
-        title: String,
-        canvas: Canvas,
-        initBorderX: Float,
-        yBodyInitPosition: Float,
-        textSize: Float,
-        spacer: Float,
-        paint: Paint,
-        paintRect: Paint,
-        options: List<T>,
-        listSelectedOptions: List<T>
-    ) {
-
-        canvas.drawText(
-            title,
-            initBorderX, calculateYPosition(yBodyInitPosition, 0, textSize, spacer), paint
-        )
-
-        val yInitPositionCheckOptions = calculateYPosition(yBodyInitPosition, 1, textSize, spacer)
-        for (i in options.indices) {
-            val recInitX = initBorderX
-            val recInitY = calculateYPosition(
-                yInitPositionCheckOptions,
-                i,
-                textSize,
-                spacer
-            ) - textSize + 2f
-            val recEndX = initBorderX + 10f
-            val recEndY = calculateYPosition(
-                yInitPositionCheckOptions,
-                i,
-                textSize,
-                spacer
-            ) - textSize + 12f
-
-            if (listSelectedOptions.contains(options[i])) {
-                //floatArray(x,y,endx,endy)
-                val crossFloatArray = floatArrayOf(
-                    recInitX,
-                    recInitY,
-                    recEndX,
-                    recEndY,
-                    recEndX,
-                    recInitY,
-                    recInitX,
-                    recEndY
-                )
-                canvas.drawLines(
-                    crossFloatArray, paint
-                )
-            }
-            canvas.drawRect(
-                RectF(
-                    recInitX,
-                    recInitY,
-                    recEndX,
-                    recEndY
-                ), paintRect
-            )
-            canvas.drawText(
-                options[i].name,
-                initBorderX + 12f,
-                calculateYPosition(yInitPositionCheckOptions, i, textSize, spacer),
-                paint
-            )
-        }
     }
 }
 
