@@ -18,7 +18,7 @@ import java.io.IOException
 import java.io.OutputStream
 
 class ExternalPrivateImageStoreService(val appContext: Context) : ImageStoreService {
-//TODO adicionar feature para apagar as imagens que não não mais usadas
+    //TODO adicionar feature para apagar as imagens que não não mais usadas
     override fun saveImage(bitmap: Bitmap, nameImage: String): String {
         validateImageName(nameImage)
         val imageFile = createImageFile(nameImage)
@@ -42,12 +42,15 @@ class ExternalPrivateImageStoreService(val appContext: Context) : ImageStoreServ
         return saveImage(bitmap, nameImage)
     }
 
+    override fun deleteImageByNameImage(nameImage: String) {
+        val image = getImageFile(nameImage)
+        image.delete()
+    }
+
+
     override fun getImage(nameImage: String): Bitmap {
         validateImageName(nameImage)
-        val imageFile = File(
-            appContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES),
-            "$FILE_FOLDER/$nameImage.jpg"
-        )
+        val imageFile = getImageFile(nameImage)
         return try {
             FileInputStream(imageFile).use { stream ->
                 BitmapFactory.decodeStream(stream)
@@ -58,6 +61,11 @@ class ExternalPrivateImageStoreService(val appContext: Context) : ImageStoreServ
             throw FileNotFoundException("Arquivo não encontrado: $nameImage")
         }
     }
+
+    private fun getImageFile(nameImage: String) = File(
+        appContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+        "$FILE_FOLDER/$nameImage.jpg"
+    )
 
     @SuppressLint("Recycle")
     private fun convertUriToBitmap(uri: Uri): Bitmap {
@@ -93,6 +101,7 @@ class ExternalPrivateImageStoreService(val appContext: Context) : ImageStoreServ
         return Environment.getExternalStorageState() in
                 setOf(Environment.MEDIA_MOUNTED, Environment.MEDIA_MOUNTED_READ_ONLY)
     }
+
     private fun correctBitmapOrientation(bitmap: Bitmap, uri: Uri): Bitmap {
         val inputStream = appContext.contentResolver.openInputStream(uri)
         val exif = inputStream?.let { ExifInterface(it) }
@@ -114,6 +123,7 @@ class ExternalPrivateImageStoreService(val appContext: Context) : ImageStoreServ
 
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
     }
+
     companion object {
         private const val LOG_TAG = "ExternalPrivateImageStoreService"
         private const val FILE_FOLDER = "RecordImages"

@@ -6,6 +6,7 @@ import android.net.Uri
 interface ImageStoreService {
     fun saveImage(bitmap: Bitmap,nameImage:String): String
     fun saveImageByUri(uri: Uri,nameImage:String):String
+    fun deleteImageByNameImage(nameImage:String)
     fun getImage(nameImage: String): Bitmap
 
 }
