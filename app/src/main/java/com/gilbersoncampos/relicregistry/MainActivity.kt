@@ -1,6 +1,7 @@
 package com.gilbersoncampos.relicregistry
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -40,6 +41,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.gilbersoncampos.relicregistry.data.model.CatalogRecordModel
 import com.gilbersoncampos.relicregistry.data.model.RecordModel
+import com.gilbersoncampos.relicregistry.data.services.ImageStoreService
 import com.gilbersoncampos.relicregistry.navigation.Destination
 import com.gilbersoncampos.relicregistry.navigation.NavGraphHost
 import com.gilbersoncampos.relicregistry.screen.editRecord.navigateToEditRecord

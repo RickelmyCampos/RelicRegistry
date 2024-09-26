@@ -39,7 +39,7 @@ class EditRecordViewModel @Inject constructor(
             repository.getRecordById(id).collectLatest { record ->
                 _savedRecord = record
                 delay(300)
-                updateUiState( _savedRecord.copy())
+                updateUiState(_savedRecord.copy())
                 viewModelScope.launch(Dispatchers.IO) {
                     val bitmaps = _savedRecord.listImages.map { getImage(it) }
                     updateUiState(_savedRecord.copy(), images = bitmaps)
@@ -48,25 +48,31 @@ class EditRecordViewModel @Inject constructor(
             }
         }
     }
+
     fun saveImages(uris: List<Uri>) {
         val imageNames: MutableList<String> = mutableListOf()
         val imagesBitmaps: MutableList<Bitmap> = mutableListOf()
-        deleteOldImages()
+        //deleteOldImages()
+        //TODO não deletar  criar uma copia com os antigos, só deletar ao clicar no botão de salvar
         uris.forEachIndexed { index, item ->
             val name =
-                "Record_${(_uiState.value as EditRecordUiState.Success).state.record.identification}_$index"
+                "Record_${(_uiState.value as EditRecordUiState.Success).state.record.identification}_${index}_new"
             imageStoreService.saveImageByUri(
                 item,
                 name
             )
             imageNames.add(name)
             imagesBitmaps.add(getImage(name))
-            updateUiState(record = (_uiState.value as EditRecordUiState.Success).state.record.copy(listImages = imageNames), images = imagesBitmaps)
+            updateUiState(
+                record = (_uiState.value as EditRecordUiState.Success).state.record.copy(
+                    listImages = imageNames
+                ), images = imagesBitmaps
+            )
         }
     }
 
     private fun deleteOldImages() {
-        (_uiState.value as EditRecordUiState.Success).state.record.listImages.forEach {
+        _savedRecord.listImages.forEach {
             imageStoreService.deleteImageByNameImage(it)
         }
     }
@@ -74,11 +80,29 @@ class EditRecordViewModel @Inject constructor(
     fun getImage(name: String): Bitmap {
         return imageStoreService.getImage(nameImage = name)
     }
+
+    //deleta imagens antigas e salva as novas
     fun saveRecord() {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.updateRecord((_uiState.value as EditRecordUiState.Success).state.record)
+
+            deleteOldImages()
+            val newListImages =
+                (_uiState.value as EditRecordUiState.Success).state.record.listImages.map {
+                    val newName = it.replace(
+                        "_new",
+                        ""
+                    )
+                    imageStoreService.renameImage(
+                        it, newName
+                    )
+                    newName
+                }
+            repository.updateRecord(
+                (_uiState.value as EditRecordUiState.Success).state.record.copy(listImages = newListImages)
+            )
         }
     }
+
     fun updateUiState(record: CatalogRecordModel, images: List<Bitmap> = emptyList()) {
         _uiState.value = EditRecordUiState.Success(
             SuccessUiState(
@@ -89,11 +113,15 @@ class EditRecordViewModel @Inject constructor(
         )
     }
 
-    fun generatePdf(){
-        pdfService.generatePdf(_savedRecord, listImages =(_uiState.value as? EditRecordUiState.Success)?.state?.images?: listOf())
+    fun generatePdf() {
+        pdfService.generatePdf(
+            _savedRecord,
+            listImages = (_uiState.value as? EditRecordUiState.Success)?.state?.images ?: listOf()
+        )
     }
-    fun getPDF():File{
-       return pdfService.getPDF()
+
+    fun getPDF(): File {
+        return pdfService.getPDF()
     }
 }
 

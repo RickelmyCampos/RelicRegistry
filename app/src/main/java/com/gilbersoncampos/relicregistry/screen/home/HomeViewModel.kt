@@ -13,8 +13,8 @@ class HomeViewModel @Inject constructor(private val imageStoreService: ImageStor
 
     private lateinit var _path:String
     fun saveImage(bitmap: Bitmap) {
-      _path =  imageStoreService.saveImage(bitmap,"newImage").split("/").last()
-        Log.d("path",_path.split("/").last())
+//      _path =  imageStoreService.saveImage(bitmap,"newImage").split("/").last()
+//        Log.d("path",_path.split("/").last())
     }
     fun getImage() :Bitmap{
         return imageStoreService.getImage(_path)

@@ -24,7 +24,7 @@ fun NavGraphHost(navHostController: NavHostController) {
         startDestination = Destination.ListRecord.route,
         navController = navHostController
     ) {
-        homeScreen()
+        //homeScreen()
         editRecordScreen(onBack = navHostController::navigateUp)
         recordListScreen(navigateToEditRecord = { navHostController.navigateToEditRecord(it) })
     }
