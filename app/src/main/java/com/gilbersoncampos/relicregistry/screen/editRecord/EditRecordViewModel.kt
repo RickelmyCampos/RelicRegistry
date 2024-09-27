@@ -41,7 +41,7 @@ class EditRecordViewModel @Inject constructor(
                 delay(300)
                 updateUiState(_savedRecord.copy())
                 viewModelScope.launch(Dispatchers.IO) {
-                    val bitmaps = _savedRecord.listImages.map { getImage(it) }
+                    val bitmaps = _savedRecord.listImages.map { getImage(it,false) }
                     updateUiState(_savedRecord.copy(), images = bitmaps)
                 }
 
@@ -56,13 +56,13 @@ class EditRecordViewModel @Inject constructor(
         //TODO não deletar  criar uma copia com os antigos, só deletar ao clicar no botão de salvar
         uris.forEachIndexed { index, item ->
             val name =
-                "Record_${(_uiState.value as EditRecordUiState.Success).state.record.identification}_${index}_new"
-            imageStoreService.saveImageByUri(
+                "Record_${(_uiState.value as EditRecordUiState.Success).state.record.identification}_${index}"
+            imageStoreService.saveUriCache(
                 item,
                 name
             )
             imageNames.add(name)
-            imagesBitmaps.add(getImage(name))
+            imagesBitmaps.add(getImage(name,true))
             updateUiState(
                 record = (_uiState.value as EditRecordUiState.Success).state.record.copy(
                     listImages = imageNames
@@ -73,32 +73,23 @@ class EditRecordViewModel @Inject constructor(
 
     private fun deleteOldImages() {
         _savedRecord.listImages.forEach {
-            imageStoreService.deleteImageByNameImage(it)
+            imageStoreService.deleteCache(it)
         }
     }
 
-    fun getImage(name: String): Bitmap {
-        return imageStoreService.getImage(nameImage = name)
+    private fun getImage(name: String,isCache:Boolean): Bitmap {
+        return imageStoreService.getImage(imageName = name,isCache=isCache)
     }
 
     //deleta imagens antigas e salva as novas
     fun saveRecord() {
         viewModelScope.launch(Dispatchers.IO) {
-
-            deleteOldImages()
-            val newListImages =
-                (_uiState.value as EditRecordUiState.Success).state.record.listImages.map {
-                    val newName = it.replace(
-                        "_new",
-                        ""
-                    )
-                    imageStoreService.renameImage(
-                        it, newName
-                    )
-                    newName
-                }
+            (_uiState.value as EditRecordUiState.Success).state.record.listImages.forEach {
+                imageStoreService.copyToExternalStoreFromCache(it)
+                imageStoreService.deleteCache(it)
+            }
             repository.updateRecord(
-                (_uiState.value as EditRecordUiState.Success).state.record.copy(listImages = newListImages)
+                (_uiState.value as EditRecordUiState.Success).state.record
             )
         }
     }

@@ -30,7 +30,7 @@ class RecordListViewModel @Inject constructor(private val repository: RecordRepo
     }
     fun getImage(name:String):Bitmap{
 
-        return imageStoreService.getImage(name)
+        return imageStoreService.getImage(name,false)
     }
 }
 

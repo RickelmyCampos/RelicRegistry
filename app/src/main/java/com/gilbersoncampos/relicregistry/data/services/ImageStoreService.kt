@@ -4,12 +4,11 @@ import android.graphics.Bitmap
 import android.net.Uri
 
 interface ImageStoreService {
-    fun saveImageByUri(uri: Uri,nameImage:String):String
-    fun deleteImageByNameImage(nameImage:String)
-    fun getImage(nameImage: String): Bitmap
-    fun deleteUnsavedImages()
-    fun renameImage(oldName:String,newName: String)
-
-    fun saveCacheImage(imageName:String):String
-
+    fun getImage(imageName: String,isCache:Boolean): Bitmap
+    fun saveCache(bitmap: Bitmap, imageName: String): String
+    fun saveUriCache(uri: Uri, imageName: String): String
+    fun convertUriToBitmap(uri: Uri): Bitmap
+    fun copyToExternalStoreFromCache(imageName: String)
+    fun copyToCacheFromExternalStore(imageName: String)
+    fun deleteCache(imageName: String)
 }

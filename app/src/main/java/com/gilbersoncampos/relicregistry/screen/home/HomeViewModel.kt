@@ -17,7 +17,7 @@ class HomeViewModel @Inject constructor(private val imageStoreService: ImageStor
 //        Log.d("path",_path.split("/").last())
     }
     fun getImage() :Bitmap{
-        return imageStoreService.getImage(_path)
+        return imageStoreService.getImage(_path,false)
     }
 
 }

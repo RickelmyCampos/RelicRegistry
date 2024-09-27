@@ -15,12 +15,50 @@ import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
-import java.io.OutputStream
 
 class ExternalPrivateImageStoreService(val appContext: Context) : ImageStoreService {
-    private fun saveImage(bitmap: Bitmap, nameImage: String,isCached: Boolean): String {
+
+    override fun saveCache(bitmap: Bitmap, imageName: String): String {
+        return saveImage(bitmap = bitmap, nameImage = imageName, isCached = true)
+    }
+
+    override fun saveUriCache(uri: Uri, imageName: String): String {
+        val bitmap=convertUriToBitmap(uri)
+        return saveCache(bitmap,imageName)
+    }
+
+    override fun copyToExternalStoreFromCache(imageName: String) {
+        val imageCachedFile = getImageFile(nameImage = imageName, fromCache = true)
+        val imageExternalStoreFile=createImageFile(imageName)
+        imageCachedFile.copyTo(imageExternalStoreFile,true)
+    }
+
+    override fun copyToCacheFromExternalStore(imageName: String) {
+        val imageExternalStoreFile=getImageFile(imageName,fromCache = false)
+        val imageCachedFile = createImageFile(nameImage = imageName, isCached = true)
+        imageExternalStoreFile.copyTo(imageCachedFile,true)
+    }
+
+    override fun deleteCache(imageName: String) {
+        val imageCachedFile = getImageFile(nameImage = imageName, fromCache = true)
+        imageCachedFile.delete()
+    }
+    override fun getImage(imageName: String,isCache:Boolean): Bitmap {
+        validateImageName(imageName)
+        val imageFile = getImageFile(imageName,isCache)
+        return try {
+            FileInputStream(imageFile).use { stream ->
+                BitmapFactory.decodeStream(stream)
+                    ?: throw FileNotFoundException("Falha ao decodificar a imagem.")
+            }
+        } catch (e: FileNotFoundException) {
+            Log.e(LOG_TAG, "Arquivo não encontrado: $imageName", e)
+            throw FileNotFoundException("Arquivo não encontrado: $imageName")
+        }
+    }
+    private fun saveImage(bitmap: Bitmap, nameImage: String, isCached: Boolean): String {
         validateImageName(nameImage)
-        val imageFile = createImageFile(nameImage,isCached)
+        val imageFile = createImageFile(nameImage, isCached)
         return try {
             FileOutputStream(imageFile).use { stream ->
                 if (!bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)) {
@@ -35,77 +73,19 @@ class ExternalPrivateImageStoreService(val appContext: Context) : ImageStoreServ
             throw IOException("Não foi possível salvar a imagem.", e)
         }
     }
-
-    override fun saveImageByUri(uri: Uri, nameImage: String): String {
-        val bitmap = convertUriToBitmap(uri)
-        return saveImage(bitmap, nameImage,false)
-    }
-
-    override fun deleteImageByNameImage(nameImage: String) {
-        val image = getImageFile(nameImage)
-        image.delete()
-    }
-
-
-    override fun getImage(nameImage: String): Bitmap {
-        validateImageName(nameImage)
-        val imageFile = getImageFile(nameImage)
-        return try {
-            FileInputStream(imageFile).use { stream ->
-                BitmapFactory.decodeStream(stream)
-                    ?: throw FileNotFoundException("Falha ao decodificar a imagem.")
-            }
-        } catch (e: FileNotFoundException) {
-            Log.e(LOG_TAG, "Arquivo não encontrado: $nameImage", e)
-            throw FileNotFoundException("Arquivo não encontrado: $nameImage")
-        }
-    }
-
-    override fun deleteUnsavedImages() {
-        val appDirectory = File(
-            appContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES),
-            FILE_FOLDER
-        )
-        Log.d("Files","chamou")
-        val listFiles = appDirectory.listFiles()
-        listFiles?.forEach {
-            Log.d("Files", it.name)
-            if(it.name.contains("_new")){
-                deleteImageByNameImage(it.name.replace(".jpg",""))
-            }
-        }
-    }
-
-    override fun renameImage(oldName: String, newName: String) {
-        val imageFile = getImageFile(oldName)
-        val newImageFile = File(
-            appContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES),
-            "$FILE_FOLDER/$newName.jpg"
-        )
-        imageFile.renameTo(newImageFile)
-    }
-
-    override fun saveCacheImage(imageName:String): String {
-       val imageFile= createImageFile(imageName,true)
-        return ""
-    }
-
-    private fun getImageFile(nameImage: String) = File(
-        appContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES),
-        "$FILE_FOLDER/$nameImage.jpg"
-    )
-
     @SuppressLint("Recycle")
-    private fun convertUriToBitmap(uri: Uri): Bitmap {
+    override fun convertUriToBitmap(uri: Uri): Bitmap {
         val inputStream = appContext.contentResolver.openInputStream(uri)
         val bitmap = BitmapFactory.decodeStream(inputStream)
             ?: throw IOException("Falha ao converter URI para Bitmap.")
         return correctBitmapOrientation(bitmap, uri)
     }
 
-    private fun createImageFile(nameImage: String,isCached:Boolean=false): File {
+    private fun createImageFile(nameImage: String, isCached: Boolean = false): File {
         val appDirectory = File(
-            if(isCached) appContext.externalCacheDir else appContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+            if (isCached) appContext.externalCacheDir else appContext.getExternalFilesDir(
+                Environment.DIRECTORY_PICTURES
+            ),
             FILE_FOLDER
         )
         if (!appDirectory.exists() && !appDirectory.mkdirs()) {
@@ -114,6 +94,10 @@ class ExternalPrivateImageStoreService(val appContext: Context) : ImageStoreServ
         }
         return File(appDirectory, "$nameImage.jpg")
     }
+    private fun getImageFile(nameImage: String, fromCache: Boolean) = File(
+        if (fromCache) appContext.externalCacheDir else appContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+        "$FILE_FOLDER/$nameImage.jpg"
+    )
 
     private fun validateImageName(nameImage: String) {
         if (nameImage.isBlank()) {
@@ -152,19 +136,6 @@ class ExternalPrivateImageStoreService(val appContext: Context) : ImageStoreServ
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
     }
 
-
-    fun saveCache(){
-     TODO("IMPLEMENTAR Métodos")
-    }
-    fun copyToExternalStoreFromCache(){
-     TODO("IMPLEMENTAR Métodos")
-    }
-    fun copyToCacheFromExternalStore(){
-     TODO("IMPLEMENTAR Métodos")
-    }
-    fun deleteCache(){
-     TODO("IMPLEMENTAR Métodos")
-    }
     companion object {
         private const val LOG_TAG = "ExternalPrivateImageStoreService"
         private const val FILE_FOLDER = "RecordImages"
