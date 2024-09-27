@@ -11,4 +11,5 @@ interface ImageStoreService {
     fun copyToExternalStoreFromCache(imageName: String)
     fun copyToCacheFromExternalStore(imageName: String)
     fun deleteCache(imageName: String)
+    fun listAllImageCached():List<String>
 }

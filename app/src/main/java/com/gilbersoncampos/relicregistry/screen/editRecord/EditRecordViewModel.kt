@@ -52,8 +52,6 @@ class EditRecordViewModel @Inject constructor(
     fun saveImages(uris: List<Uri>) {
         val imageNames: MutableList<String> = mutableListOf()
         val imagesBitmaps: MutableList<Bitmap> = mutableListOf()
-        //deleteOldImages()
-        //TODO não deletar  criar uma copia com os antigos, só deletar ao clicar no botão de salvar
         uris.forEachIndexed { index, item ->
             val name =
                 "Record_${(_uiState.value as EditRecordUiState.Success).state.record.identification}_${index}"
@@ -68,12 +66,6 @@ class EditRecordViewModel @Inject constructor(
                     listImages = imageNames
                 ), images = imagesBitmaps
             )
-        }
-    }
-
-    private fun deleteOldImages() {
-        _savedRecord.listImages.forEach {
-            imageStoreService.deleteCache(it)
         }
     }
 

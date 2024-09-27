@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.gilbersoncampos.relicregistry.screen.config.settingsScreen
 import com.gilbersoncampos.relicregistry.screen.editRecord.editRecordScreen
 import com.gilbersoncampos.relicregistry.screen.editRecord.navigateToEditRecord
 import com.gilbersoncampos.relicregistry.screen.home.HomeScreen
@@ -25,6 +26,7 @@ fun NavGraphHost(navHostController: NavHostController) {
         navController = navHostController
     ) {
         //homeScreen()
+        settingsScreen()
         editRecordScreen(onBack = navHostController::navigateUp)
         recordListScreen(navigateToEditRecord = { navHostController.navigateToEditRecord(it) })
     }

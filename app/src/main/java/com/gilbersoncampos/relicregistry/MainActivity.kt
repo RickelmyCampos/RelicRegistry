@@ -17,11 +17,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -36,16 +40,22 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navOptions
 import com.gilbersoncampos.relicregistry.data.model.CatalogRecordModel
 import com.gilbersoncampos.relicregistry.data.model.RecordModel
 import com.gilbersoncampos.relicregistry.data.services.ImageStoreService
 import com.gilbersoncampos.relicregistry.navigation.Destination
 import com.gilbersoncampos.relicregistry.navigation.NavGraphHost
+import com.gilbersoncampos.relicregistry.navigation.getIcon
+import com.gilbersoncampos.relicregistry.navigation.listBottomNavigation
+import com.gilbersoncampos.relicregistry.screen.config.navigateToSettings
 import com.gilbersoncampos.relicregistry.screen.editRecord.navigateToEditRecord
 import com.gilbersoncampos.relicregistry.screen.home.navigateToHome
+import com.gilbersoncampos.relicregistry.screen.recordList.navigateToRecordList
 import com.gilbersoncampos.relicregistry.ui.theme.RelicRegistryTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -59,10 +69,10 @@ class MainActivity : ComponentActivity() {
                 val viewModel: MainViewModel = hiltViewModel()
                 var showPopUp by remember { mutableStateOf(false) }
                 val navController = rememberNavController()
-                val route = navController.currentBackStackEntryAsState().value?.destination?.route?:""
+                val route = navController.currentBackStackEntryAsState().value?.destination?.route ?: ""
+
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
-
                     floatingActionButton = {
                         if (route == Destination.ListRecord.route) {
                             FloatingActionButton(onClick = { showPopUp = true }) {
@@ -73,6 +83,41 @@ class MainActivity : ComponentActivity() {
                             }
                         }
 
+                    },
+                    bottomBar = {
+                        val navOption = navOptions {
+                            popUpTo(navController.graph.findStartDestination().id)
+                            launchSingleTop = true
+                        }
+                        NavigationBar {
+                            listBottomNavigation.forEach {
+                                NavigationBarItem(
+                                    selected = route == it.route,
+                                    onClick = {
+                                        when (it) {
+                                            Destination.EditRecord -> {
+
+                                            }
+
+                                            Destination.Home -> {}
+                                            Destination.ListRecord -> {
+                                                navController.navigateToRecordList(navOptions = navOption)
+                                            }
+
+                                            Destination.Settings -> {
+                                                navController.navigateToSettings(navOptions = navOption)
+                                            }
+                                        }
+                                    },
+                                    icon = {
+                                        Icon(
+                                            imageVector = it.getIcon(),
+                                            contentDescription = it.route
+                                        )
+                                    },
+                                    label = { Text(text = it.name) })
+                            }
+                        }
                     }
                 ) { innerPadding ->
                     if (showPopUp) {
