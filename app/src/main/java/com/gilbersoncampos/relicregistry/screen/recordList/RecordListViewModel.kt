@@ -36,7 +36,7 @@ class RecordListViewModel @Inject constructor(private val repository: RecordRepo
 
 sealed class RecordUiState {
     data class Success(val records: List<CatalogRecordModel>) : RecordUiState()
-    object Error : RecordUiState()
-    object Loading : RecordUiState()
+    data object Error : RecordUiState()
+    data object Loading : RecordUiState()
 
 }
