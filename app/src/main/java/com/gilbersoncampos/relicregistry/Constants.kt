@@ -1,6 +1,9 @@
 package com.gilbersoncampos.relicregistry
 
+import com.gilbersoncampos.relicregistry.data.enums.FormFieldType
 import com.gilbersoncampos.relicregistry.data.model.DropdownData
+import com.gilbersoncampos.relicregistry.data.model.Form
+import com.gilbersoncampos.relicregistry.data.model.FormField
 
 
 object Constants {
@@ -119,6 +122,29 @@ object Constants {
         "Chocalho", "Recipiente", "Instrumento musical",
         "Amuleto", "Cachimbo", "Arma", "Outra", "Não identificada"
     )
-
+    val formDefault =
+        Form(
+            id = "", title = "Formulário De estatueta", fields = listOf(
+                FormField(id = "0", label = "Campo1", value = "", typeField = FormFieldType.TEXT),
+                FormField(id = "1", label = "Campo2", value = "", typeField = FormFieldType.TEXT),
+                FormField(id = "2", label = "Campo3", value = "", typeField = FormFieldType.TEXT),
+                FormField(id = "3", label = "Campo4", value = "", typeField = FormFieldType.TEXT),
+                FormField(id = "4", label = "Campo5", value = "", typeField = FormFieldType.TEXT),
+                FormField(id = "5", label = "Campo6", value = "", typeField = FormFieldType.TEXT),
+                FormField(id = "6", label = "Campo7", value = "", typeField = FormFieldType.TEXT),
+                FormField(id = "8", label = "Campo8", value = "", typeField = FormFieldType.TEXT),
+                FormField(id = "9", label = "Campo8", value = "", typeField = FormFieldType.TEXT),
+                FormField(id = "10", label = "Campo8", value = "", typeField = FormFieldType.TEXT),
+                FormField(id = "11", label = "Campo8", value = "", typeField = FormFieldType.TEXT),
+                FormField(id = "12", label = "Campo8", value = "", typeField = FormFieldType.TEXT),
+                FormField(id = "13", label = "Campo8", value = "", typeField = FormFieldType.TEXT),
+                FormField(id = "14", label = "Campo8", value = "", typeField = FormFieldType.TEXT),
+                FormField(id = "15", label = "Campo8", value = "", typeField = FormFieldType.TEXT),
+                FormField(id = "16", label = "Campo8", value = "", typeField = FormFieldType.TEXT),
+                FormField(id = "17", label = "Campo8", value = "", typeField = FormFieldType.TEXT),
+                FormField(id = "18", label = "Campo8", value = "", typeField = FormFieldType.UNIQUEOPTION, options = "teste1|teste"),
+                FormField(id = "19", label = "Campo8", value = "", typeField = FormFieldType.MULTIPLEOPTIONS, options = "teste1|teste"),
+            )
+        )
 
 }

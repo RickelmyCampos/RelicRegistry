@@ -54,6 +54,7 @@ import com.gilbersoncampos.relicregistry.navigation.getIcon
 import com.gilbersoncampos.relicregistry.navigation.listBottomNavigation
 import com.gilbersoncampos.relicregistry.screen.config.navigateToSettings
 import com.gilbersoncampos.relicregistry.screen.editRecord.navigateToEditRecord
+import com.gilbersoncampos.relicregistry.screen.form.navigateToForm
 import com.gilbersoncampos.relicregistry.screen.home.navigateToHome
 import com.gilbersoncampos.relicregistry.screen.recordList.navigateToRecordList
 import com.gilbersoncampos.relicregistry.ui.theme.RelicRegistryTheme
@@ -69,7 +70,8 @@ class MainActivity : ComponentActivity() {
                 val viewModel: MainViewModel = hiltViewModel()
                 var showPopUp by remember { mutableStateOf(false) }
                 val navController = rememberNavController()
-                val route = navController.currentBackStackEntryAsState().value?.destination?.route ?: ""
+                val route =
+                    navController.currentBackStackEntryAsState().value?.destination?.route ?: ""
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
@@ -85,10 +87,6 @@ class MainActivity : ComponentActivity() {
 
                     },
                     bottomBar = {
-                        val navOption = navOptions {
-                            popUpTo(navController.graph.findStartDestination().id)
-                            launchSingleTop = true
-                        }
                         NavigationBar {
                             listBottomNavigation.forEach {
                                 NavigationBarItem(
@@ -101,11 +99,24 @@ class MainActivity : ComponentActivity() {
 
                                             Destination.Home -> {}
                                             Destination.ListRecord -> {
-                                                navController.navigateToRecordList(navOptions = navOption)
+                                                navController.navigateToRecordList(navOptions = navOptions {
+                                                    popUpTo(navController.graph.findStartDestination().id)
+                                                    launchSingleTop = true
+                                                })
                                             }
 
                                             Destination.Settings -> {
-                                                navController.navigateToSettings(navOptions = navOption)
+                                                navController.navigateToSettings(navOptions = navOptions {
+                                                    popUpTo(navController.graph.findStartDestination().id)
+                                                    launchSingleTop = true
+                                                })
+                                            }
+
+                                            Destination.Form -> {
+                                                navController.navigateToForm(navOptions = navOptions {
+                                                    popUpTo(navController.graph.findStartDestination().id)
+                                                    launchSingleTop = true
+                                                })
                                             }
                                         }
                                     },
@@ -211,8 +222,10 @@ fun Popup(
 
 @Composable
 fun App(modifier: Modifier = Modifier, navHostController: NavHostController) {
+    Column(modifier = modifier) {
 
-    NavGraphHost(navHostController)
+        NavGraphHost(navHostController)
+    }
 }
 
 
