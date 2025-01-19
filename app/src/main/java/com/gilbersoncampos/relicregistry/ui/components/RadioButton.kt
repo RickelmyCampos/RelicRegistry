@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.gilbersoncampos.relicregistry.extensions.getNameTranslated
 import com.gilbersoncampos.relicregistry.ui.theme.RelicRegistryTheme
 
 @Composable
@@ -42,7 +43,10 @@ fun<T> TextRadioButton(
                     onClick = { onOptionSelected(item) }
                 )
                 Text(
-                    text = item.toString(),
+                    text = when (item) {
+                        is Enum<*> -> item.getNameTranslated()
+                        else -> item.toString()
+                    },
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(start = 16.dp)
                 )

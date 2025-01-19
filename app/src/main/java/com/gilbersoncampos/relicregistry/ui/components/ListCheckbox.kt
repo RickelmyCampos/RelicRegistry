@@ -8,9 +8,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.gilbersoncampos.relicregistry.extensions.getNameTranslated
 
 @Composable
-fun<T> ListCheckbox(
+fun <T> ListCheckbox(
     list: List<T>,
     listSelected: List<T>,
     onCheckedChange: (List<T>, Boolean) -> Unit
@@ -18,14 +19,19 @@ fun<T> ListCheckbox(
     list.forEach { item ->
         val mListSelected = listSelected.toMutableList()
 
-        TextCheckbox({ selected ->
-            if (!selected) {
-                mListSelected.remove(item)
-            } else {
-                mListSelected.add(item)
-            }
-            onCheckedChange(mListSelected, true)
-        }, item.toString(), listSelected.contains(item))
+        TextCheckbox(
+            { selected ->
+                if (!selected) {
+                    mListSelected.remove(item)
+                } else {
+                    mListSelected.add(item)
+                }
+                onCheckedChange(mListSelected, true)
+            }, when (item) {
+                is Enum<*> -> item.getNameTranslated()
+                else -> item.toString()
+            }, listSelected.contains(item)
+        )
     }
 }
 

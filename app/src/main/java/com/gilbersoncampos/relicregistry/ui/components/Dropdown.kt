@@ -19,12 +19,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.gilbersoncampos.relicregistry.data.model.DropdownData
+import com.gilbersoncampos.relicregistry.extensions.getNameTranslated
 import com.gilbersoncampos.relicregistry.ui.theme.RelicRegistryTheme
 
 
-
 @Composable
-fun<T> CustomDropdown(
+fun <T> CustomDropdown(
     list: List<T>,
     selectedState: T?,
     onSelect: (T) -> Unit,
@@ -43,8 +43,12 @@ fun<T> CustomDropdown(
     Button(
         onClick = { expanded = !expanded },
         modifier = Modifier.fillMaxWidth(),
-        ) {
-        Text(text = selectedState?.toString()?: "Selecione uma opção")
+    ) {
+        Text(text = when (selectedState) {
+            is Enum<*> -> selectedState.getNameTranslated()
+            null-> "Selecione uma opção"
+            else -> selectedState.toString()
+        })
     }
     RenderDropDownModal(
         list = list,
@@ -58,7 +62,7 @@ fun<T> CustomDropdown(
 }
 
 @Composable
-fun<T> RenderDropDownModal(
+fun <T> RenderDropDownModal(
     list: List<T>,
     expanded: Boolean,
     selectState: (T) -> Unit,
@@ -92,14 +96,21 @@ fun<T> RenderDropDownModal(
 }
 
 @Composable
-fun<T> DropDownItem(
+fun <T> DropDownItem(
     item: T,
     isSelected: Boolean = false,
     onSelect: (T) -> Unit
 ) {
     DropdownMenuItem(
         colors = MenuDefaults.itemColors(textColor = if (isSelected) MaterialTheme.colorScheme.primary else Color.Black),
-        text = { Text(item.toString()) },
+        text = {
+            Text(
+                when (item) {
+                    is Enum<*> -> item.getNameTranslated()
+                    else -> item.toString()
+                }
+            )
+        },
         onClick = { onSelect(item) })
 }
 
