@@ -29,24 +29,24 @@ class ExternalPrivateImageStoreService(private val appContext: Context) : ImageS
 
     override fun copyToExternalStoreFromCache(imageName: String) {
         try {
-        val imageCachedFile = getImageFile(nameImage = imageName, fromCache = true)
-        val imageExternalStoreFile = createImageFile(imageName)
-        imageCachedFile.copyTo(imageExternalStoreFile, true)
-        }catch (_:NoSuchFileException){
+            val imageCachedFile = getImageFile(nameImage = imageName, fromCache = true)
+            val imageExternalStoreFile = createImageFile(imageName)
+            imageCachedFile.copyTo(imageExternalStoreFile, true)
+        } catch (_: NoSuchFileException) {
 
-        }catch (_:FileAlreadyExistsException){
+        } catch (_: FileAlreadyExistsException) {
 
         }
     }
 
     override fun copyToCacheFromExternalStore(imageName: String) {
         try {
-        val imageExternalStoreFile = getImageFile(imageName, fromCache = false)
-        val imageCachedFile = createImageFile(nameImage = imageName, isCached = true)
-        imageExternalStoreFile.copyTo(imageCachedFile, true)
-        }catch (_:NoSuchFileException){
+            val imageExternalStoreFile = getImageFile(imageName, fromCache = false)
+            val imageCachedFile = createImageFile(nameImage = imageName, isCached = true)
+            imageExternalStoreFile.copyTo(imageCachedFile, true)
+        } catch (_: NoSuchFileException) {
 
-        }catch (_:FileAlreadyExistsException){
+        } catch (_: FileAlreadyExistsException) {
 
         }
     }
@@ -61,7 +61,7 @@ class ExternalPrivateImageStoreService(private val appContext: Context) : ImageS
             appContext.externalCacheDir,
             FILE_FOLDER
         )
-        return appDirectory.listFiles()?.map { it.name.replace(".jpg","") } ?: listOf()
+        return appDirectory.listFiles()?.map { it.name.replace(".jpg", "") } ?: listOf()
 
     }
 
