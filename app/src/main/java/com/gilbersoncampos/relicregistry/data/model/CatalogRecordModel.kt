@@ -63,6 +63,12 @@ data class CatalogRecordModel(
         val results = mutableListOf<PDFFormStructureModel>()
         results.add(
             PDFFormStructureModel(
+                TypeFormPDF.IMAGE,
+                "Fotos:",
+              )
+        )
+        results.add(
+            PDFFormStructureModel(
                 TypeFormPDF.SELECT,
                 "Artefato",
                 options = StatueType.entries.map { entry ->
