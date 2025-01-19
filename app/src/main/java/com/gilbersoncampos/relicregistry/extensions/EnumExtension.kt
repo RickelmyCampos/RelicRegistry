@@ -161,14 +161,6 @@ fun Enum<*>.getNameTranslated(): String {
             PlasticDecoration.PERFORATED_HOLE ->  "Orifício vazado"
             PlasticDecoration.NON_PERFORATED_HOLE -> "Orifício não vazado"
             PlasticDecoration.HANDLE -> "Alça"
-            PlasticDecoration.ENLARGED_LOBES -> "TODO()"
-            PlasticDecoration.LOINCLOTH ->"TODO()"
-            PlasticDecoration.GARMENTS -> "TODO()"
-            PlasticDecoration.ORNAMENTS -> "TODO()"
-            PlasticDecoration.DIADEMS -> "TODO()"
-            PlasticDecoration.HAIRSTYLE -> "TODO()"
-            PlasticDecoration.MASK -> "TODO()"
-            PlasticDecoration.EMBLEMS -> "TODO()"
         }
 
         is AccessoryType -> when (this) {
@@ -187,22 +179,17 @@ fun Enum<*>.getNameTranslated(): String {
             BodyPosition.SQUATTING -> "Acocorado"
             BodyPosition.STANDING_PROFILE -> "Em pé (Perfil)"
             BodyPosition.DUAL_PERSPECTIVE -> "Perspectiva dual"
-            BodyPosition.RATTLE -> "TODO()"
-            BodyPosition.AMULET -> "TODO()"
-            BodyPosition.CONTAINER -> "TODO()"
-            BodyPosition.PIPE -> "TODO()"
-            BodyPosition.MUSICAL_INSTRUMENT ->" TODO()"
-            BodyPosition.WEAPON -> "TODO()"
-            BodyPosition.OTHER -> "TODO()"
+            BodyPosition.ARMS_AWAY_FROM_THE_BODY -> "Braços afastados do corpo"
+            BodyPosition.SEATED -> "Sentado"
+            BodyPosition.ARMS_CLOSE_TO_THE_BODY -> "Braços colados ao corpo"
         }
 
         is Uses -> when (this) {
             Uses.RATTLE -> "Chocalho"
-            Uses.AMULET -> "TODO()"
+            Uses.AMULET -> "Amuleto"
             Uses.CONTAINER -> "Recipiente"
-            Uses.PIPE -> "TODO()"
-            Uses.INSTRUMENT -> "Instrumento musical"
-            Uses.MUSICAL -> "Instrumento musical"
+            Uses.PIPE -> "Cachimbo"
+            Uses.MUSICAL_INSTRUMENT -> "Instrumento musical"
             Uses.WEAPON -> "Arma"
             Uses.OTHER -> "Outra"
             Uses.NOT_IDENTIFIED -> "Não identificada"
