@@ -20,7 +20,7 @@ import com.gilbersoncampos.relicregistry.ui.theme.RelicRegistryTheme
 @Composable
 fun HeaderActionSelect(size:Int,actionRemove:()->Unit) {
     Row(modifier = Modifier.fillMaxWidth().padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text("$size selecionados")
+        Text("$size ${if(size==1)"selecionado" else "selecionados"}")
         Spacer(modifier = Modifier.weight(1f))
         IconButton(actionRemove) {
             Icon(imageVector = Icons.Default.Delete, contentDescription = "remove icon")

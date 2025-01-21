@@ -114,6 +114,7 @@ import com.gilbersoncampos.relicregistry.data.model.Uses
 import com.gilbersoncampos.relicregistry.extensions.hasOnlyNumber
 import com.gilbersoncampos.relicregistry.extensions.toOnlyFloat
 import com.gilbersoncampos.relicregistry.ui.components.Accordion
+import com.gilbersoncampos.relicregistry.ui.components.AlertDialogCustom
 import com.gilbersoncampos.relicregistry.ui.components.CustomDropdown
 import com.gilbersoncampos.relicregistry.ui.components.ImageCarrousel
 import com.gilbersoncampos.relicregistry.ui.components.ListCheckbox
@@ -228,22 +229,13 @@ fun EditRecordForm(
         showDialog = true
     }
     if (showDialog) {
-        AlertDialog(
-            title = { Text(text = "Ficha com alterações pendentes") },
-            text = { Text(text = "Deseja sair sem salvar as alterações?") },
-            onDismissRequest = { showDialog = false },
-            dismissButton = {
-                TextButton(onClick = { showDialog = false }) {
-                    Text(text = "Não")
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    showDialog = false
-                    onBack()
-                }) {
-                    Text(text = "Sim")
-                }
+        AlertDialogCustom(
+            title = "Ficha com alterações pendentes",
+            text = "Deseja sair sem salvar as alterações?",
+            onDismiss = { showDialog = false },
+            onConfirm = {
+                showDialog = false
+                onBack()
             })
     }
 
