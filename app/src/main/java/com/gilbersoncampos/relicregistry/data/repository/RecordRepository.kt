@@ -10,5 +10,6 @@ interface RecordRepository{
     suspend fun getLastRecord():CatalogRecordModel
     suspend fun getRecordById(id:Long): Flow<CatalogRecordModel>
     suspend fun updateRecord(record: CatalogRecordModel)
+    suspend fun removeRecords(recordList:List<CatalogRecordModel>)
 
 }

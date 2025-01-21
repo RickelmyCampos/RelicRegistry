@@ -1,6 +1,7 @@
 package com.gilbersoncampos.relicregistry.data.local.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
@@ -19,4 +20,8 @@ interface RecordDao {
      fun getRecordById(id:Long):Flow<CatalogRecordEntity>
     @Update
     suspend fun updateRecord(record: CatalogRecordEntity)
+    @Delete
+    suspend fun deleteRecord(record: CatalogRecordEntity)
+    @Query("DELETE FROM catalog_records WHERE id IN (:ids)")
+    suspend fun deleteRecords(ids: List<Long>)
 }

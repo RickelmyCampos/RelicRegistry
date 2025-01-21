@@ -33,4 +33,9 @@ class RecordRepositoryImpl @Inject constructor(private val recordDao: RecordDao)
     override suspend fun updateRecord(record: CatalogRecordModel) {
         recordDao.updateRecord(record.toEntity())
     }
+
+    override suspend fun removeRecords(recordList: List<CatalogRecordModel>) {
+        val idList = recordList.map { it.id }
+        recordDao.deleteRecords(idList)
+    }
 }

@@ -2,10 +2,11 @@ package com.gilbersoncampos.relicregistry.screen.recordList
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import androidx.activity.compose.BackHandler
+import android.widget.Toast
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,30 +18,25 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.gilbersoncampos.relicregistry.R
 import com.gilbersoncampos.relicregistry.data.model.CatalogRecordModel
-import com.gilbersoncampos.relicregistry.data.model.RecordModel
+import com.gilbersoncampos.relicregistry.ui.components.HeaderActionSelect
 import com.gilbersoncampos.relicregistry.ui.theme.RelicRegistryTheme
 
 @Composable
@@ -50,12 +46,24 @@ fun RecordListScreen(
 ) {
     val uiState = viewModel.uiState.collectAsState().value
 
-    RecordListUI(uiState, onSelectRecord = navigateToEditRecord,getBitmap=viewModel::getImage)
+    RecordListUI(
+        uiState,
+        onClickRecord = navigateToEditRecord,
+        onSelectRecord = viewModel::selectRecords,
+        removeListRecords = viewModel::removeRecordsSelected,
+        getBitmap = viewModel::getImage
+    )
 
 }
 
 @Composable
-fun RecordListUI(uiState: RecordUiState, onSelectRecord: (Long) -> Unit,getBitmap:(String)->Bitmap) {
+fun RecordListUI(
+    uiState: RecordUiState,
+    onClickRecord: (Long) -> Unit,
+    onSelectRecord: (CatalogRecordModel) -> Unit,
+    removeListRecords:()->Unit,
+    getBitmap: (String) -> Bitmap
+) {
     Column(modifier = Modifier.fillMaxSize()) {
         when (uiState) {
             RecordUiState.Error -> {
@@ -75,17 +83,34 @@ fun RecordListUI(uiState: RecordUiState, onSelectRecord: (Long) -> Unit,getBitma
             is RecordUiState.Success -> {
                 if (uiState.records.isEmpty()) {
                     Column(
-                        modifier = Modifier.fillMaxSize().padding(16.dp),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(text = "Nenhuma ficha encontrada, Adicione clicando no botão abaixo")
                     }
                 } else {
+                    if(uiState.recordsSelected.isNotEmpty()){
+                        HeaderActionSelect(uiState.recordsSelected.size){
+                            removeListRecords()
+                        }
+                    }
                     LazyColumn {
                         items(uiState.records) {
-                            RelicItem(it,getBitmap=getBitmap) {
-                                onSelectRecord(it.id)
+                            RelicItem(
+                                it,
+                                getBitmap = getBitmap,
+                                isSelected = uiState.recordsSelected.contains(it),
+                                onLongPress = {
+                                    onSelectRecord(it)
+                                }) {
+                                if (uiState.recordsSelected.isNotEmpty()) {
+                                    onSelectRecord(it)
+                                    return@RelicItem
+                                }
+                                onClickRecord(it.id)
                             }
                         }
                     }
@@ -97,27 +122,52 @@ fun RecordListUI(uiState: RecordUiState, onSelectRecord: (Long) -> Unit,getBitma
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun RelicItem(relic: CatalogRecordModel, getBitmap: (String) -> Bitmap, onClick: () -> Unit) {
+private fun RelicItem(
+    relic: CatalogRecordModel,
+    getBitmap: (String) -> Bitmap,
+    isSelected: Boolean = false,
+    onLongPress: () -> Unit,
+    onClick: () -> Unit,
+) {
+    val haptics = LocalHapticFeedback.current
     Row(modifier = Modifier
         .fillMaxWidth()
-        .clickable { onClick() }
+        .combinedClickable(onLongClick = {
+            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+            onLongPress()
+        }) { onClick() }
+        .background(if (isSelected) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.background)
         .padding(6.dp)) {
-        if (relic.listImages.isEmpty()){
-            Image(
-                painter = painterResource(id = R.drawable.ic_image_basic),
-                contentDescription = "image relic",
-                modifier = Modifier
-                    .size(50.dp)
-                    .background(Color.Gray)
-            )
-        }else{
-            Image(
-                bitmap = getBitmap(relic.listImages[0]).asImageBitmap(),
-                contentDescription = "image relic",
-                modifier = Modifier
-                    .size(50.dp)
-                    .background(Color.Gray) )
+        when{
+            isSelected->{
+                Image(
+                    painter = painterResource(id = R.drawable.ic_check),
+                    contentDescription = "image relic checked",
+                    modifier = Modifier
+                        .size(50.dp)
+                        .background(Color.Gray)
+                )
+            }
+            relic.listImages.isEmpty()->{
+                Image(
+                    painter = painterResource(id = R.drawable.ic_image_basic),
+                    contentDescription = "image relic",
+                    modifier = Modifier
+                        .size(50.dp)
+                        .background(Color.Gray)
+                )
+            }
+            else->{
+                Image(
+                    bitmap = getBitmap(relic.listImages[0]).asImageBitmap(),
+                    contentDescription = "image relic",
+                    modifier = Modifier
+                        .size(50.dp)
+                        .background(Color.Gray)
+                )
+            }
         }
 
         Spacer(modifier = Modifier.width(4.dp))
@@ -132,6 +182,6 @@ private fun RelicItem(relic: CatalogRecordModel, getBitmap: (String) -> Bitmap, 
 @Composable
 fun RecordListUIPreview() {
     RelicRegistryTheme {
-        RecordListUI(RecordUiState.Loading,{},{BitmapFactory.decodeFile("")})
+        RecordListUI(RecordUiState.Loading, {}, {},{}, { BitmapFactory.decodeFile("") })
     }
 }
