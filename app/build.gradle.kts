@@ -64,6 +64,9 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    //charts
+    implementation("com.github.tehras:charts:0.2.4-alpha")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -90,6 +93,7 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     //serialization
     implementation("com.google.code.gson:gson:2.11.0")
+    implementation(kotlin("reflect"))
 }
 kapt {
     correctErrorTypes = true

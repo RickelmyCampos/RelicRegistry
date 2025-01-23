@@ -1,5 +1,7 @@
 package com.gilbersoncampos.relicregistry.di
 
+import com.gilbersoncampos.relicregistry.data.repository.DataAnalysisRepository
+import com.gilbersoncampos.relicregistry.data.repository.Impl.DataAnalysisRepositoryImpl
 import com.gilbersoncampos.relicregistry.data.repository.Impl.RecordRepositoryImpl
 import com.gilbersoncampos.relicregistry.data.repository.RecordRepository
 import dagger.Binds
@@ -15,4 +17,6 @@ import dagger.hilt.android.components.ViewModelComponent
 internal abstract class AppModule{
     @Binds
     abstract fun bindRecordRepository(impl: RecordRepositoryImpl): RecordRepository
+    @Binds
+    abstract fun bindDataAnalysisRepository(impl: DataAnalysisRepositoryImpl): DataAnalysisRepository
 }

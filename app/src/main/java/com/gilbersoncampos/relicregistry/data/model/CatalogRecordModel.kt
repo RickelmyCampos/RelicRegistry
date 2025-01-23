@@ -1,6 +1,30 @@
 package com.gilbersoncampos.relicregistry.data.model
 
+import com.gilbersoncampos.relicregistry.data.enums.AccessoryType
+import com.gilbersoncampos.relicregistry.data.enums.BodyPosition
+import com.gilbersoncampos.relicregistry.data.enums.Condition
+import com.gilbersoncampos.relicregistry.data.enums.DecorationLocation
+import com.gilbersoncampos.relicregistry.data.enums.DecorationType
+import com.gilbersoncampos.relicregistry.data.enums.FilterEnum
+import com.gilbersoncampos.relicregistry.data.enums.Firing
+import com.gilbersoncampos.relicregistry.data.enums.GeneralBodyShape
+import com.gilbersoncampos.relicregistry.data.enums.Genitalia
+import com.gilbersoncampos.relicregistry.data.enums.LowerLimbs
+import com.gilbersoncampos.relicregistry.data.enums.ManufacturingMarks
+import com.gilbersoncampos.relicregistry.data.enums.ManufacturingTechnique
+import com.gilbersoncampos.relicregistry.data.enums.PaintColor
+import com.gilbersoncampos.relicregistry.data.enums.PaintColorExternal
+import com.gilbersoncampos.relicregistry.data.enums.PaintColorInternal
+import com.gilbersoncampos.relicregistry.data.enums.PlasticDecoration
+import com.gilbersoncampos.relicregistry.data.enums.StatueType
+import com.gilbersoncampos.relicregistry.data.enums.SurfaceTreatment
+import com.gilbersoncampos.relicregistry.data.enums.SurfaceTreatmentExternal
+import com.gilbersoncampos.relicregistry.data.enums.SurfaceTreatmentInternal
+import com.gilbersoncampos.relicregistry.data.enums.Temper
 import com.gilbersoncampos.relicregistry.data.enums.TypeFormPDF
+import com.gilbersoncampos.relicregistry.data.enums.UpperLimbs
+import com.gilbersoncampos.relicregistry.data.enums.UsageMarks
+import com.gilbersoncampos.relicregistry.data.enums.Uses
 import com.gilbersoncampos.relicregistry.extensions.getNameTranslated
 
 data class CatalogRecordModel(
@@ -65,194 +89,188 @@ data class CatalogRecordModel(
             PDFFormStructureModel(
                 TypeFormPDF.IMAGE,
                 "Fotos:",
-              )
+            )
         )
         results.add(
             PDFFormStructureModel(
                 TypeFormPDF.SELECT,
-                "Artefato",
+                FilterEnum.STATUE_TYPE.translatedName,
                 options = StatueType.entries.map { entry ->
-                    val selected=entry==statueType
+                    val selected = entry == statueType
                     OptionsPDFModel(entry.getNameTranslated(), selected)
                 })
         )
         results.add(
             PDFFormStructureModel(
                 TypeFormPDF.SELECT,
-                "Condição",
+                FilterEnum.CONDITION.translatedName,
                 options = Condition.entries.map { entry ->
-                    val selected=entry==condition
+                    val selected = entry == condition
                     OptionsPDFModel(entry.getNameTranslated(), selected)
                 })
         )
         results.add(
             PDFFormStructureModel(
                 TypeFormPDF.SELECT,
-                "Forma Geral do Corpo",
+                FilterEnum.GENERAL_BODY_SHAPE.translatedName,
                 options = GeneralBodyShape.entries.map { entry ->
-                    val selected=entry==generalBodyShape
+                    val selected = entry == generalBodyShape
                     OptionsPDFModel(entry.getNameTranslated(), selected)
                 })
         )
         results.add(
             PDFFormStructureModel(
                 TypeFormPDF.SELECT,
-                "Membros Superiores",
+                FilterEnum.UPPER_LIMBS.translatedName,
                 options = UpperLimbs.entries.map { entry ->
-                    val selected=upperLimbs.contains(entry)
+                    val selected = upperLimbs.contains(entry)
                     OptionsPDFModel(entry.getNameTranslated(), selected)
                 })
         )
         results.add(
             PDFFormStructureModel(
                 TypeFormPDF.SELECT,
-                "Membros Inferiores",
-                options = LowerLimbs.entries.map { entry ->
-                    val selected=lowerLimbs.contains(entry)
+                FilterEnum.LOWER_LIMBS.translatedName, options = LowerLimbs.entries.map { entry ->
+                    val selected = lowerLimbs.contains(entry)
                     OptionsPDFModel(entry.getNameTranslated(), selected)
                 })
         )
         results.add(
             PDFFormStructureModel(
                 TypeFormPDF.SELECT,
-                "Fabricação de Genitália",
-                options = Genitalia.entries.map { entry ->
-                    val selected=entry==genitalia
+                FilterEnum.GENITALIA.translatedName, options = Genitalia.entries.map { entry ->
+                    val selected = entry == genitalia
                     OptionsPDFModel(entry.getNameTranslated(), selected)
                 })
         )
         results.add(
             PDFFormStructureModel(
                 TypeFormPDF.SELECT,
-                "Queima",
-                options = Firing.entries.map { entry ->
-                    val selected=firing.contains(entry)
+                FilterEnum.FIRING.translatedName, options = Firing.entries.map { entry ->
+                    val selected = firing.contains(entry)
                     OptionsPDFModel(entry.getNameTranslated(), selected)
                 })
         )
         results.add(
             PDFFormStructureModel(
                 TypeFormPDF.SELECT,
-                "Antiplástico",
-                options = Temper.entries.map { entry ->
-                    val selected=temper.contains(entry)
+                FilterEnum.TEMPER.translatedName, options = Temper.entries.map { entry ->
+                    val selected = temper.contains(entry)
                     OptionsPDFModel(entry.getNameTranslated(), selected)
                 })
         )
         results.add(
             PDFFormStructureModel(
                 TypeFormPDF.SELECT,
-                "Técnica de fabricação",
+                FilterEnum.MANUFACTURING_TECHNIQUE.translatedName,
                 options = ManufacturingTechnique.entries.map { entry ->
-                    val selected=manufacturingTechnique.contains(entry)
+                    val selected = manufacturingTechnique.contains(entry)
                     OptionsPDFModel(entry.getNameTranslated(), selected)
                 })
         )
         results.add(
             PDFFormStructureModel(
                 TypeFormPDF.SELECT,
-                "Marcas de fabricação",
+                FilterEnum.MANUFACTURING_MARKS.translatedName,
                 options = ManufacturingMarks.entries.map { entry ->
-                    val selected=manufacturingMarks.contains(entry)
+                    val selected = manufacturingMarks.contains(entry)
                     OptionsPDFModel(entry.getNameTranslated(), selected)
                 })
         )
         results.add(
             PDFFormStructureModel(
                 TypeFormPDF.SELECT,
-                "Marcas de Uso",
-                options = UsageMarks.entries.map { entry ->
-                    val selected=usageMarks.contains(entry)
+                FilterEnum.USAGE_MARKS.translatedName, options = UsageMarks.entries.map { entry ->
+                    val selected = usageMarks.contains(entry)
                     OptionsPDFModel(entry.getNameTranslated(), selected)
                 })
         )
         results.add(
             PDFFormStructureModel(
                 TypeFormPDF.SELECT,
-                "Tratamento de Sup. (I.T.)",
+                FilterEnum.SURFACE_TREATMENT_INTERNAL.translatedName,
                 options = SurfaceTreatment.entries.map { entry ->
-                    val selected=surfaceTreatmentInternal.contains(entry)
+                    val selected = surfaceTreatmentInternal.contains(entry)
                     OptionsPDFModel(entry.getNameTranslated(), selected)
                 })
         )
         results.add(
             PDFFormStructureModel(
                 TypeFormPDF.SELECT,
-                "Tratamento de Sup. (E.T.)",
+                FilterEnum.SURFACE_TREATMENT_EXTERNAL.translatedName,
                 options = SurfaceTreatment.entries.map { entry ->
-                    val selected=surfaceTreatmentExternal.contains(entry)
+                    val selected = surfaceTreatmentExternal.contains(entry)
                     OptionsPDFModel(entry.getNameTranslated(), selected)
                 })
         )
         results.add(
             PDFFormStructureModel(
                 TypeFormPDF.SELECT,
-                "Decoração",
+                FilterEnum.DECORATION_LOCATION.translatedName,
                 options = DecorationLocation.entries.map { entry ->
-                    val selected=decorationLocation==entry
+                    val selected = decorationLocation == entry
                     OptionsPDFModel(entry.getNameTranslated(), selected)
                 })
         )
         results.add(
             PDFFormStructureModel(
                 TypeFormPDF.SELECT,
-                "Tipo de decoração",
+                FilterEnum.DECORATION_TYPE.translatedName,
                 options = DecorationType.entries.map { entry ->
-                    val selected=decorationType.contains(entry)
+                    val selected = decorationType.contains(entry)
                     OptionsPDFModel(entry.getNameTranslated(), selected)
                 })
         )
         results.add(
             PDFFormStructureModel(
                 TypeFormPDF.SELECT,
-                "Cor da pintura (F.I)",
+                FilterEnum.PAINT_COLOR_INTERNAL.translatedName,
                 options = PaintColor.entries.map { entry ->
-                    val selected=internalPaintColor.contains(entry)
+                    val selected = internalPaintColor.contains(entry)
                     OptionsPDFModel(entry.getNameTranslated(), selected)
                 })
         )
         results.add(
             PDFFormStructureModel(
                 TypeFormPDF.SELECT,
-                "Cor da pintura (F.E)",
+                FilterEnum.PAINT_COLOR_EXTERNAL.translatedName,
                 options = PaintColor.entries.map { entry ->
-                    val selected=externalPaintColor.contains(entry)
+                    val selected = externalPaintColor.contains(entry)
                     OptionsPDFModel(entry.getNameTranslated(), selected)
                 })
         )
         results.add(
             PDFFormStructureModel(
                 TypeFormPDF.SELECT,
-                "Decoração plástica",
+                FilterEnum.PLASTIC_DECORATION.translatedName,
                 options = PlasticDecoration.entries.map { entry ->
-                    val selected=plasticDecoration.contains(entry)
+                    val selected = plasticDecoration.contains(entry)
                     OptionsPDFModel(entry.getNameTranslated(), selected)
                 })
         )
         results.add(
             PDFFormStructureModel(
                 TypeFormPDF.SELECT,
-                "Outros atributos formais",
+                FilterEnum.ACCESSORY_TYPE.translatedName,
                 options = AccessoryType.entries.map { entry ->
-                    val selected=otherFormalAttributes.contains(entry)
+                    val selected = otherFormalAttributes.contains(entry)
                     OptionsPDFModel(entry.getNameTranslated(), selected)
                 })
         )
         results.add(
             PDFFormStructureModel(
                 TypeFormPDF.SELECT,
-                "Posição corporal",
+                FilterEnum.BODY_POSITION.translatedName,
                 options = BodyPosition.entries.map { entry ->
-                    val selected=bodyPosition.contains(entry)
+                    val selected = bodyPosition.contains(entry)
                     OptionsPDFModel(entry.getNameTranslated(), selected)
                 })
         )
         results.add(
             PDFFormStructureModel(
                 TypeFormPDF.SELECT,
-                "Usos",
-                options = Uses.entries.map { entry ->
-                    val selected=uses.contains(entry)
+                FilterEnum.USES.translatedName, options = Uses.entries.map { entry ->
+                    val selected = uses.contains(entry)
                     OptionsPDFModel(entry.getNameTranslated(), selected)
                 })
         )
@@ -261,33 +279,10 @@ data class CatalogRecordModel(
                 TypeFormPDF.TEXT,
                 "Observações: ",
                 text = observations
-               )
+            )
         )
 
         return results
 
     }
 }
-
-// Enum classes to capture the fixed options
-
-enum class StatueType { ANTHROPOMORPHIC, ZOOMORPHIC, ANTHROPOZOOMORPHIC, HEAD, BODY, OTHER }
-enum class Condition { INTACT, FRAGMENTED, RECONSTITUTED }
-enum class GeneralBodyShape { SOLID, HOLLOW, NATURALISTIC, STYLIZED, CYLINDRICAL, GLOBULAR, TRAPEZOIDAL, PHALLIC }
-
-enum class UpperLimbs { HEAD, EYES, NOSE, EARS, MOUTH, NECK, SHOULDERS, CHEST, BREASTS, ARMS, HANDS, FINGERS, NAVEL, }
-enum class LowerLimbs { BUTTOCKS, ANUS, LEGS, FEET, TOES }
-enum class Genitalia { MALE, FEMALE }
-enum class Firing { OXIDIZING, REDUCING, REDUCED_CORE, INTERNAL_OXIDIZING_EXTERNAL_REDUCING, INTERNAL_REDUCING_EXTERNAL_OXIDIZING, UNIDENTIFIED }
-enum class Temper { MINERAL, QUARTZ, MICA, IRON_OXIDE, CHARCOAL, GROG, CARAIPE, SHELL, CAUIXI }
-enum class ManufacturingTechnique { COIL_BUILDING, MODELING, SLAB_BUILDING, PIT_FINGER, MOLDING }
-enum class ManufacturingMarks { IMPRESSIONS, FIRING_MARKS }
-enum class UsageMarks { CARBON_CRUST, SOOT, RESIN, SCRATCHES, NONE, OTHER }
-enum class SurfaceTreatment { SMOOTHED, POLISHED, BURNISHED, RESIN, BRUSHED, SLIP, BARBOTINE, NONE }
-enum class DecorationLocation { EXTERNAL, INTERNAL, BOTH }
-enum class DecorationType { PAINTED, PLASTIC }
-enum class PaintColor { WHITE, BLACK, CREAM_BEIGE, OTHER, UNIDENTIFIED }
-enum class PlasticDecoration { INCISION, EXCISION, EYE_APPLIQUE, MAMIFORM_APPLIQUE, PUNCTATION, FINGERPRINT, PERFORATED_HOLE, NON_PERFORATED_HOLE, HANDLE}
-enum class AccessoryType { STRETCHED_LOBES, THONGS, CLOTHING, ORNAMENTS, DIADEMS, HAIRSTYLE, MASK, EMBLEMS }
-enum class BodyPosition { STANDING_FRONTAL, SQUATTING, STANDING_PROFILE, DUAL_PERSPECTIVE,ARMS_AWAY_FROM_THE_BODY,SEATED,ARMS_CLOSE_TO_THE_BODY }
-enum class Uses { RATTLE, AMULET, CONTAINER, PIPE, MUSICAL_INSTRUMENT, WEAPON, OTHER, NOT_IDENTIFIED }

@@ -12,10 +12,11 @@ sealed class Destination(val route: String, val name: String) {
     data object ListRecord : Destination("list_record", "Fichas")
     data object Settings : Destination("config", "Configuração")
     data object Form : Destination("form", "Formulário")
+    data object Charts : Destination("charts", "Gráficos")
 }
 
 val listBottomNavigation: List<Destination> =
-    listOf(Destination.ListRecord, Destination.Settings)
+    listOf(Destination.ListRecord,Destination.Charts, Destination.Settings)
 
 fun Destination.getIcon(): ImageVector {
     return when (this) {
@@ -24,5 +25,6 @@ fun Destination.getIcon(): ImageVector {
         Destination.ListRecord -> Icons.Default.Home
         Destination.Settings -> Icons.Default.Settings
         Destination.Form -> Icons.Default.Settings
+        Destination.Charts -> Icons.Default.Settings
     }
 }

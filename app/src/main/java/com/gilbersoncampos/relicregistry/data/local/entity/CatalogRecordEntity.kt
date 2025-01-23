@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import com.gilbersoncampos.relicregistry.data.local.database.Converters
-import com.gilbersoncampos.relicregistry.data.model.UpperLimbs
+import com.gilbersoncampos.relicregistry.data.enums.UpperLimbs
 
 @Entity(tableName = "catalog_records")
 @TypeConverters(Converters::class)

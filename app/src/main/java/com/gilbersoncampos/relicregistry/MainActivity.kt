@@ -52,6 +52,7 @@ import com.gilbersoncampos.relicregistry.navigation.Destination
 import com.gilbersoncampos.relicregistry.navigation.NavGraphHost
 import com.gilbersoncampos.relicregistry.navigation.getIcon
 import com.gilbersoncampos.relicregistry.navigation.listBottomNavigation
+import com.gilbersoncampos.relicregistry.screen.chart.navigateToCharts
 import com.gilbersoncampos.relicregistry.screen.config.navigateToSettings
 import com.gilbersoncampos.relicregistry.screen.editRecord.navigateToEditRecord
 import com.gilbersoncampos.relicregistry.screen.form.navigateToForm
@@ -93,11 +94,6 @@ class MainActivity : ComponentActivity() {
                                     selected = route == it.route,
                                     onClick = {
                                         when (it) {
-                                            Destination.EditRecord -> {
-
-                                            }
-
-                                            Destination.Home -> {}
                                             Destination.ListRecord -> {
                                                 navController.navigateToRecordList(navOptions = navOptions {
                                                     popUpTo(navController.graph.findStartDestination().id)
@@ -118,6 +114,13 @@ class MainActivity : ComponentActivity() {
                                                     launchSingleTop = true
                                                 })
                                             }
+                                            Destination.Charts->{
+                                                navController.navigateToCharts(navOptions = navOptions {
+                                                    popUpTo(navController.graph.findStartDestination().id)
+                                                    launchSingleTop = true
+                                                })
+                                            }
+                                            else->{}
                                         }
                                     },
                                     icon = {
