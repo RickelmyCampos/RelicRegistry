@@ -34,4 +34,6 @@ interface RecordDao {
 
     @Query("SELECT COUNT(id) as value,:filter as label FROM catalog_records GROUP BY :filter")
     fun fetchFilter(filter:String): Flow<List<FilterDataChart>>
+    @Query("SELECT archaeologicalSite FROM catalog_records GROUP BY archaeologicalSite")
+    fun getAllArchaeologicalSite(): Flow<List<String>>
 }

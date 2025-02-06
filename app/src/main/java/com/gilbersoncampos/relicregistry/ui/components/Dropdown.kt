@@ -1,5 +1,6 @@
 package com.gilbersoncampos.relicregistry.ui.components
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -9,6 +10,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -28,7 +30,8 @@ fun <T> CustomDropdown(
     list: List<T>,
     selectedState: T?,
     onSelect: (T) -> Unit,
-    title: String
+    title: String,
+    hasSearch: Boolean = false
 ) {
     var expanded by remember {
         mutableStateOf(false)
@@ -44,11 +47,13 @@ fun <T> CustomDropdown(
         onClick = { expanded = !expanded },
         modifier = Modifier.fillMaxWidth(),
     ) {
-        Text(text = when (selectedState) {
-            is Enum<*> -> selectedState.getNameTranslated()
-            null-> "Selecione uma opção"
-            else -> selectedState.toString()
-        })
+        Text(
+            text = when (selectedState) {
+                is Enum<*> -> selectedState.getNameTranslated()
+                null -> "Selecione uma opção"
+                else -> selectedState.toString()
+            }
+        )
     }
     RenderDropDownModal(
         list = list,
@@ -56,7 +61,9 @@ fun <T> CustomDropdown(
         selectState = onSelect,
         selectedState = selectedState,
         title = title,
-        onDismissRequest = { expanded = false })
+        onDismissRequest = { expanded = false },
+        hasSearch = hasSearch
+    )
 
 
 }
@@ -68,7 +75,8 @@ fun <T> RenderDropDownModal(
     selectState: (T) -> Unit,
     selectedState: T?,
     title: String,
-    onDismissRequest: () -> Unit
+    onDismissRequest: () -> Unit,
+    hasSearch: Boolean
 ) {
     if (expanded) {
         AlertDialog(
@@ -81,13 +89,34 @@ fun <T> RenderDropDownModal(
                 )
             },
             text = {
-                LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                    items(list) { item ->
-                        DropDownItem(item = item, isSelected = item == selectedState, onSelect = {
-                            selectState(it)
-                            onDismissRequest()
-                        })
-                        HorizontalDivider()
+                var searchWords by remember { mutableStateOf("") }
+                val listFiltered = list.filter {
+                    if (searchWords.isBlank()) return@filter true
+                    val text = when (it) {
+                        is Enum<*> -> it.getNameTranslated()
+                        else -> it.toString()
+                    }
+                    text.contains(searchWords,true)
+                }
+                Column {
+                    if (hasSearch) {
+                        OutlinedTextField(
+                            value = searchWords,
+                            onValueChange = { searchWords = it },
+                            label = { Text("Pesquisar") }
+                        )
+                    }
+                    LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                        items(listFiltered) { item ->
+                            DropDownItem(
+                                item = item,
+                                isSelected = item == selectedState,
+                                onSelect = {
+                                    selectState(it)
+                                    onDismissRequest()
+                                })
+                            HorizontalDivider()
+                        }
                     }
                 }
             }
@@ -107,6 +136,7 @@ fun <T> DropDownItem(
             Text(
                 when (item) {
                     is Enum<*> -> item.getNameTranslated()
+                    null-> "Selecione uma opção"
                     else -> item.toString()
                 }
             )
@@ -118,7 +148,13 @@ fun <T> DropDownItem(
 @Preview
 fun CustomDropdownPreview() {
     RelicRegistryTheme {
-        CustomDropdown(list = listOf(), selectedState = null, onSelect = {}, title = "teste")
+        CustomDropdown(
+            list = listOf("TESTE", "ALgo"),
+            selectedState = null,
+            onSelect = {},
+            title = "teste",
+            hasSearch = true
+        )
     }
 }
 

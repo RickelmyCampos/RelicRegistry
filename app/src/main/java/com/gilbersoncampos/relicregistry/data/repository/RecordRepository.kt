@@ -11,5 +11,5 @@ interface RecordRepository{
     suspend fun getRecordById(id:Long): Flow<CatalogRecordModel>
     suspend fun updateRecord(record: CatalogRecordModel)
     suspend fun removeRecords(recordList:List<CatalogRecordModel>)
-
+    suspend fun getAllArchaeologicalSite():Flow<List<String>>
 }

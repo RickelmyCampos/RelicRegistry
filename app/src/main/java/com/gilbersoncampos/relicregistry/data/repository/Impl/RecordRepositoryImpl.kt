@@ -38,4 +38,8 @@ class RecordRepositoryImpl @Inject constructor(private val recordDao: RecordDao)
         val idList = recordList.map { it.id }
         recordDao.deleteRecords(idList)
     }
+
+    override suspend fun getAllArchaeologicalSite(): Flow<List<String>> {
+       return flow { recordDao.getAllArchaeologicalSite().collect{emit(it)} }
+    }
 }
