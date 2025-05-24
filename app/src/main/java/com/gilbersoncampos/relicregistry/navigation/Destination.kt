@@ -4,7 +4,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
+import com.gilbersoncampos.relicregistry.R
 
 sealed class Destination(val route: String, val name: String) {
     data object Home : Destination("home", "Home")
@@ -18,6 +21,7 @@ sealed class Destination(val route: String, val name: String) {
 val listBottomNavigation: List<Destination> =
     listOf(Destination.ListRecord,Destination.Charts, Destination.Settings)
 
+@Composable
 fun Destination.getIcon(): ImageVector {
     return when (this) {
         Destination.EditRecord -> Icons.Default.Edit
@@ -25,6 +29,6 @@ fun Destination.getIcon(): ImageVector {
         Destination.ListRecord -> Icons.Default.Home
         Destination.Settings -> Icons.Default.Settings
         Destination.Form -> Icons.Default.Settings
-        Destination.Charts -> Icons.Default.Settings
+        Destination.Charts -> ImageVector.vectorResource(R.drawable.ic_chart)
     }
 }
