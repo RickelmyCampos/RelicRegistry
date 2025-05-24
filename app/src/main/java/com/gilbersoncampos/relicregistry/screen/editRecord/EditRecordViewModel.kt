@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gilbersoncampos.relicregistry.data.model.CatalogRecordModel
 import com.gilbersoncampos.relicregistry.data.model.RecordModel
 import com.gilbersoncampos.relicregistry.data.repository.RecordRepository
@@ -97,10 +98,12 @@ class EditRecordViewModel @Inject constructor(
     }
 
     fun generatePdf() {
-        pdfService.generatePdf(
-            _savedRecord,
-            listImages = (_uiState.value as? EditRecordUiState.Success)?.state?.images ?: listOf()
-        )
+        viewModelScope.launch(Dispatchers.IO) {
+            pdfService.generatePdf(
+                _savedRecord,
+                listImages = (_uiState.value as? EditRecordUiState.Success)?.state?.images ?: listOf()
+            )
+        }
     }
 
     fun getPDF(): File {

@@ -13,12 +13,14 @@ import com.gilbersoncampos.relicregistry.data.enums.TypeFormPDF
 import com.gilbersoncampos.relicregistry.data.model.CatalogRecordModel
 import com.gilbersoncampos.relicregistry.data.model.PDFFormStructureModel
 import com.gilbersoncampos.relicregistry.data.services.PdfService
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 
 
 class ExternalPdfService(private val context: Context) : PdfService {
-    override fun generatePdf(record: CatalogRecordModel, listImages: List<Bitmap>) {
+    override suspend fun generatePdf(record: CatalogRecordModel, listImages: List<Bitmap>) {
         // Cria um novo documento PDF
         val pdfDocument = PdfDocument()
 
@@ -34,7 +36,9 @@ class ExternalPdfService(private val context: Context) : PdfService {
 
         // Salva o documento em um arquivo
         try {
-            pdfDocument.writeTo(FileOutputStream(file))
+            withContext(Dispatchers.IO) {
+                pdfDocument.writeTo(FileOutputStream(file))
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }

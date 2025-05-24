@@ -5,6 +5,6 @@ import com.gilbersoncampos.relicregistry.data.model.CatalogRecordModel
 import java.io.File
 
 interface PdfService {
-    fun generatePdf(record:CatalogRecordModel,listImages: List<Bitmap>)
+   suspend fun generatePdf(record:CatalogRecordModel,listImages: List<Bitmap>)
     fun getPDF(): File
 }
