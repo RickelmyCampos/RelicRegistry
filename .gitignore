@@ -32,3 +32,6 @@ google-services.json
 
 # Android Profiling
 *.hprof
+
+#remove build release
+app/release
