@@ -42,13 +42,13 @@ fun Enum<*>.getNameTranslated(): String {
 
         is Condition -> when (this) {
             Condition.INTACT -> "Inteiro"
-            Condition.FRAGMENTED -> "Fragmanetado"
+            Condition.FRAGMENTED -> "Fragmentado"
             Condition.RECONSTITUTED -> "Reconstituido"
         }
 
         is GeneralBodyShape -> when (this) {
-            GeneralBodyShape.SOLID -> "Sólida"
-            GeneralBodyShape.HOLLOW -> "Oca"
+//            GeneralBodyShape.SOLID -> "Sólida"
+//            GeneralBodyShape.HOLLOW -> "Oca"
             GeneralBodyShape.NATURALISTIC -> "Naturalista"
             GeneralBodyShape.STYLIZED -> "Estilizada"
             GeneralBodyShape.CYLINDRICAL -> "Cilíndrica"
@@ -108,7 +108,7 @@ fun Enum<*>.getNameTranslated(): String {
         }
 
         is ManufacturingTechnique -> when (this) {
-            ManufacturingTechnique.COIL_BUILDING -> "Acordelado ou roleitado"
+            ManufacturingTechnique.COIL_BUILDING -> "Acordelado ou roletado"
             ManufacturingTechnique.MODELING -> "Modelado"
             ManufacturingTechnique.SLAB_BUILDING -> "Placas"
             ManufacturingTechnique.PIT_FINGER -> "Moldado"
@@ -125,6 +125,7 @@ fun Enum<*>.getNameTranslated(): String {
             UsageMarks.SOOT -> "Fuligem"
             UsageMarks.RESIN -> "Resina"
             UsageMarks.SCRATCHES -> "Ranhuras"
+            UsageMarks.GEMMULES -> "Gêmulas"
             UsageMarks.NONE -> "Não possui"
             UsageMarks.OTHER -> "Outra"
         }
@@ -171,6 +172,7 @@ fun Enum<*>.getNameTranslated(): String {
             AccessoryType.ORNAMENTS -> "Adornos"
             AccessoryType.DIADEMS -> "Diademas"
             AccessoryType.HAIRSTYLE -> "Penteado"
+            AccessoryType.ORIFICES -> "Orifícios"
             AccessoryType.MASK -> "Máscara"
             AccessoryType.EMBLEMS -> "Emblemas"
         }
@@ -194,6 +196,7 @@ fun Enum<*>.getNameTranslated(): String {
             Uses.WEAPON -> "Arma"
             Uses.OTHER -> "Outra"
             Uses.NOT_IDENTIFIED -> "Não identificada"
+            Uses.TOYS -> "Brinquedos"
         }
         is FilterEnum-> this.translatedName
 
