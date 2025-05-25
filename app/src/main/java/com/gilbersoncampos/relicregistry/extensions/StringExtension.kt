@@ -1,5 +1,10 @@
 package com.gilbersoncampos.relicregistry.extensions
 
+import android.os.Build
+import androidx.annotation.RequiresApi
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
 fun String.toOnlyFloat(): Float {
     return try {
         this.toFloat()
@@ -13,4 +18,6 @@ fun String.hasOnlyNumber(): Boolean {
     val regex = Regex("[0-9]+")
     return regex.matches(this)
 }
+
+
 

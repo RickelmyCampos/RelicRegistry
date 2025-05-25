@@ -3,11 +3,13 @@ package com.gilbersoncampos.relicregistry.screen.editRecord
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Build
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -111,6 +113,7 @@ import com.gilbersoncampos.relicregistry.data.enums.UpperLimbs
 import com.gilbersoncampos.relicregistry.data.enums.UsageMarks
 import com.gilbersoncampos.relicregistry.data.enums.Uses
 import com.gilbersoncampos.relicregistry.extensions.hasOnlyNumber
+import com.gilbersoncampos.relicregistry.extensions.toBrDateTime
 import com.gilbersoncampos.relicregistry.extensions.toOnlyFloat
 import com.gilbersoncampos.relicregistry.ui.components.Accordion
 import com.gilbersoncampos.relicregistry.ui.components.AlertDialogCustom
@@ -121,6 +124,7 @@ import com.gilbersoncampos.relicregistry.ui.components.Session
 import com.gilbersoncampos.relicregistry.ui.components.SubSession
 import com.gilbersoncampos.relicregistry.ui.components.TextCheckbox
 import com.gilbersoncampos.relicregistry.ui.components.TextRadioButton
+import java.time.format.DateTimeFormatter
 import kotlin.math.round
 
 @Composable
@@ -370,6 +374,7 @@ private fun FullScreenImageDialog(bitmap: Bitmap, onDismiss: () -> Unit) {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun Sessions(
     uiState: SuccessUiState,
@@ -381,6 +386,10 @@ private fun Sessions(
             InfosRow(title = "Sítio arqueológico:", value = uiState.record.archaeologicalSite)
             InfosRow(title = "Prateleira:", value = uiState.record.shelfLocation)
             InfosRow(title = "Grupo:", value = uiState.record.group)
+            uiState.record.createdAt?.let {
+                InfosRow(title = "Criado em:", value = it.toBrDateTime())
+            }
+
         }
     }
     DimensionSession(uiState.record, updateRecord)
