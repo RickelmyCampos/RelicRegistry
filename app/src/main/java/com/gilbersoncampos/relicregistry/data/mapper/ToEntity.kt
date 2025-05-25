@@ -61,6 +61,7 @@ fun CatalogRecordModel.toEntity(): CatalogRecordEntity {
         observations = this.observations,
         listImages = this.listImages,
         id = this.id,
-        hasDecoration = this.hasDecoration
+        hasDecoration = this.hasDecoration,
+        createdAt = this.createdAt
     )
 }

@@ -26,6 +26,8 @@ import com.gilbersoncampos.relicregistry.data.enums.UpperLimbs
 import com.gilbersoncampos.relicregistry.data.enums.UsageMarks
 import com.gilbersoncampos.relicregistry.data.enums.Uses
 import com.gilbersoncampos.relicregistry.extensions.getNameTranslated
+import java.time.LocalDateTime
+import java.util.Date
 
 data class CatalogRecordModel(
     val id: Long,
@@ -72,6 +74,7 @@ data class CatalogRecordModel(
     // Observations
     val observations: String,
     val hasDecoration: Boolean = false,
+    val createdAt: LocalDateTime? = null
 ) {
     fun generateHeader(): List<String> {
         val result = mutableListOf<String>()

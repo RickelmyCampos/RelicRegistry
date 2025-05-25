@@ -5,6 +5,8 @@ import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import com.gilbersoncampos.relicregistry.data.local.database.Converters
 import com.gilbersoncampos.relicregistry.data.enums.UpperLimbs
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Entity(tableName = "catalog_records")
 @TypeConverters(Converters::class)
@@ -63,4 +65,5 @@ data class CatalogRecordEntity(
     // Observations
     val observations: String,
     val hasDecoration: Boolean ,
+    val createdAt: LocalDateTime?
 )

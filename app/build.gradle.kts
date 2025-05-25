@@ -4,13 +4,17 @@ plugins {
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
     alias(libs.plugins.compose.compiler)
+    //alias(libs.plugins.androidx.room)
+    id("androidx.room")
 
 }
 
 android {
     namespace = "com.gilbersoncampos.relicregistry"
     compileSdk = 34
-
+    room {
+        schemaDirectory("$projectDir/schemas")
+    }
     defaultConfig {
         applicationId = "com.gilbersoncampos.relicregistry"
         minSdk = 24
@@ -52,6 +56,7 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
 }
 
 dependencies {
