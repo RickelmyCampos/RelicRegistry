@@ -4,18 +4,21 @@ import android.util.Log
 import com.gilbersoncampos.relicregistry.data.local.dao.RecordDao
 import com.gilbersoncampos.relicregistry.data.mapper.toEntity
 import com.gilbersoncampos.relicregistry.data.mapper.toModel
+import com.gilbersoncampos.relicregistry.data.mapper.toRecordRemote
 import com.gilbersoncampos.relicregistry.data.model.CatalogRecordModel
 import com.gilbersoncampos.relicregistry.data.model.RecordModel
+import com.gilbersoncampos.relicregistry.data.remote.RemoteDataSource
 import com.gilbersoncampos.relicregistry.data.repository.RecordRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-class RecordRepositoryImpl @Inject constructor(private val recordDao: RecordDao) :
+class RecordRepositoryImpl @Inject constructor(private val recordDao: RecordDao,private val remoteDataSource: RemoteDataSource) :
     RecordRepository {
     override suspend fun createRecord(record: CatalogRecordModel) {
         recordDao.createRecord(record.toEntity())
-        Log.d(javaClass.simpleName, "createRecord: $record")
+        val recordCreated =getLastRecord()
+        remoteDataSource.createRecord(recordCreated)
     }
 
     override suspend fun getAllRecord(): Flow<List<CatalogRecordModel>> {

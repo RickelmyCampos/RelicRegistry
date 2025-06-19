@@ -21,6 +21,8 @@ import com.gilbersoncampos.relicregistry.data.enums.Temper
 import com.gilbersoncampos.relicregistry.data.enums.UpperLimbs
 import com.gilbersoncampos.relicregistry.data.enums.UsageMarks
 import com.gilbersoncampos.relicregistry.data.enums.Uses
+import com.gilbersoncampos.relicregistry.extensions.toLocalDateTime
+import com.google.firebase.firestore.DocumentSnapshot
 
 
 fun CatalogRecordEntity.toModel(): CatalogRecordModel {
@@ -102,4 +104,71 @@ fun CatalogRecordEntity.toModel(): CatalogRecordModel {
         createdAt = this.createdAt
 
     )
+}
+fun DocumentSnapshot.toRecordModel():CatalogRecordModel{
+    return CatalogRecordModel(
+        archaeologicalSite = data!!["archaeologicalSite"].toString(),
+        identification = data!!["identification"].toString(),
+        classification = data!!["classification"].toString(),
+        shelfLocation = data!!["shelfLocation"].toString(),
+        group = data!!["group"].toString(),
+
+        // Typology
+        statueType = data?.let { StatueType.valueOf(it["statueType"].toString()) },
+        condition = data?.let { Condition.valueOf(it["condition"].toString()) },
+        generalBodyShape = data?.let { GeneralBodyShape.valueOf(it["generalBodyShape"].toString()) },
+
+        // Portions
+        upperLimbs = this.getEnumListOrNull("upperLimbs"),
+        lowerLimbs = this.getEnumListOrNull("lowerLimbs"),
+
+        // Genitalia
+        genitalia = data?.let { Genitalia.valueOf(it["genitalia"].toString()) },
+
+        // Dimensions
+        length = data?.get("length").toString().toFloat(),
+        width = data?.get("width").toString().toFloat(),
+        height = data?.get("height").toString().toFloat(),
+        weight = data?.get("weight").toString().toFloat(),
+
+        // Technology
+        firing = this.getEnumListOrNull("firing"),
+        temper = this.getEnumListOrNull("temper"),
+        manufacturingTechnique =this.getEnumListOrNull("manufacturingTechnique"),
+        manufacturingMarks = this.getEnumListOrNull("manufacturingMarks"),
+        usageMarks = this.getEnumListOrNull("usageMarks"),
+        surfaceTreatmentInternal = this.getEnumListOrNull("surfaceTreatmentInternal"),
+        surfaceTreatmentExternal = this.getEnumListOrNull("surfaceTreatmentExternal"),
+
+        // Decoration
+        decorationLocation = data?.let { DecorationLocation.valueOf(it["decorationLocation"].toString()) },
+        decorationType = this.getEnumListOrNull("decorationType"),
+        internalPaintColor = this.getEnumListOrNull("internalPaintColor"),
+        externalPaintColor = this.getEnumListOrNull("externalPaintColor"),
+        plasticDecoration = this.getEnumListOrNull("plasticDecoration"),
+
+        // Other Formal Attributes
+        otherFormalAttributes = this.getEnumListOrNull("otherFormalAttributes"),
+
+        // Body Position
+        bodyPosition = this.getEnumListOrNull("bodyPosition"),
+
+        // Uses
+        uses = this.getEnumListOrNull("uses"),
+
+        // Observations
+        observations = data!!["observations"].toString(),
+        id = data!!["id"].toString().toLong(),
+        listImages = data?.get("listImages") as? List<String> ?: listOf(),
+        hasDecoration = data!!["hasDecoration"].toString().toBoolean(),
+        createdAt = data!!["createdAt"].toString().toLocalDateTime()
+    )
+}
+inline fun <reified T : Enum<T>> DocumentSnapshot.getEnumListOrNull(key: String): List<T> {
+    val rawList = this.get(key) as? List<*>
+    return rawList?.mapNotNull { item ->
+        item?.toString()?.trim()?.let { str ->
+            enumValues<T>().firstOrNull { it.name.equals(str, ignoreCase = true) }
+        }
+    }?: listOf()
 }

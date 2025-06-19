@@ -1,5 +1,7 @@
 package com.gilbersoncampos.relicregistry.di
 
+import com.gilbersoncampos.relicregistry.data.remote.FirebaseDataSource.FirebaseDataSource
+import com.gilbersoncampos.relicregistry.data.remote.RemoteDataSource
 import com.gilbersoncampos.relicregistry.data.repository.DataAnalysisRepository
 import com.gilbersoncampos.relicregistry.data.repository.Impl.DataAnalysisRepositoryImpl
 import com.gilbersoncampos.relicregistry.data.repository.Impl.RecordRepositoryImpl
@@ -19,4 +21,6 @@ internal abstract class AppModule{
     abstract fun bindRecordRepository(impl: RecordRepositoryImpl): RecordRepository
     @Binds
     abstract fun bindDataAnalysisRepository(impl: DataAnalysisRepositoryImpl): DataAnalysisRepository
+    @Binds
+    abstract fun bindRemoteDataSource(impl: FirebaseDataSource): RemoteDataSource
 }

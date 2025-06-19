@@ -6,7 +6,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
     //alias(libs.plugins.androidx.room)
     id("androidx.room")
-
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -89,6 +89,11 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     annotationProcessor(libs.androidx.room.compiler)
 
+    //firebase
+    implementation(platform("com.google.firebase:firebase-bom:33.15.0"))
+    implementation("com.google.firebase:firebase-analytics")
+
+    implementation("com.google.firebase:firebase-firestore")
 
     // To use Kotlin annotation processing tool (kapt)
     //noinspection KaptUsageInsteadOfKsp
