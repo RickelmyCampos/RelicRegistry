@@ -8,9 +8,11 @@ import com.gilbersoncampos.relicregistry.data.model.CatalogRecordModel
 import com.gilbersoncampos.relicregistry.data.remote.RemoteDataSource
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 const val RECORD_COLECTION="record"
 class FirebaseDataSource @Inject constructor():RemoteDataSource {
@@ -38,18 +40,31 @@ class FirebaseDataSource @Inject constructor():RemoteDataSource {
         TODO("Not yet implemented")
     }
 
-    override suspend fun createRecord(record: CatalogRecordModel){
-        val re=record.toRecordRemote()
-        FirebaseFirestore.getInstance().collection(RECORD_COLECTION).add(re).addOnSuccessListener{ documentReferece->
-            documentReferece.id
-            Log.d("FIREBASE", "Enviado com sucesso")
-        }.addOnFailureListener { e->
-            Log.d("FIREBASE", "Erro ao enviar para o firebase $e")
+    override suspend fun createRecord(record: CatalogRecordModel):String { // Alterado o tipo de retorno para String
+        val re = record.toRecordRemote()
+        return try {
+            val documentReference = FirebaseFirestore.getInstance()
+                .collection(RECORD_COLECTION)
+                .add(re)
+                .await()
 
-        }
-    }
+            Log.d("FIREBASE", "Enviado com sucesso ${documentReference.id}")
+            documentReference.id
+        } catch (e: Exception) {
+            Log.e("FIREBASE", "Erro ao enviar para o firebase", e)
+            throw e
+        }}
 
     override suspend fun updateRecord(record: CatalogRecordModel) {
-       TODO("Implementar o update")
+        val re=record.toRecordRemote()
+        record.idRemote?.let {
+            FirebaseFirestore.getInstance().collection(RECORD_COLECTION).document(it).set(re, SetOptions.merge()).addOnSuccessListener{ documentReferece->
+                Log.d("FIREBASE", "Atualizado com sucesso")
+            }.addOnFailureListener { e->
+                Log.d("FIREBASE", "Erro ao enviar para o firebase $e")
+
+            }
+        }
+
     }
 }

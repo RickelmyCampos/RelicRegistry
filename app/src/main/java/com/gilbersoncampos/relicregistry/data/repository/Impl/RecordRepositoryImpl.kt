@@ -18,11 +18,12 @@ class RecordRepositoryImpl @Inject constructor(private val recordDao: RecordDao,
     override suspend fun createRecord(record: CatalogRecordModel) {
         recordDao.createRecord(record.toEntity())
         val recordCreated =getLastRecord()
-        remoteDataSource.createRecord(recordCreated)
+        val idRemote=remoteDataSource.createRecord(recordCreated)
+        updateRecord(recordCreated.copy(idRemote=idRemote))
     }
 
     override suspend fun getAllRecord(): Flow<List<CatalogRecordModel>> {
-        return flow { recordDao.getAllRecord().collect { list -> emit(list.map { it.toModel() }) } }
+        return flow { remoteDataSource.getAllRecord().collect { list -> emit(list.map { it }) } }
     }
 
     override suspend fun getLastRecord(): CatalogRecordModel {
@@ -35,6 +36,7 @@ class RecordRepositoryImpl @Inject constructor(private val recordDao: RecordDao,
 
     override suspend fun updateRecord(record: CatalogRecordModel) {
         recordDao.updateRecord(record.toEntity())
+        remoteDataSource.updateRecord(record)
     }
 
     override suspend fun removeRecords(recordList: List<CatalogRecordModel>) {

@@ -7,6 +7,6 @@ import kotlinx.coroutines.flow.Flow
 interface RemoteDataSource {
     suspend fun getAllRecord(): Flow<List<CatalogRecordModel>>
     fun getRecordById(id: Long): Flow<CatalogRecordModel>
-    suspend fun createRecord(record: CatalogRecordModel)
+    suspend fun createRecord(record: CatalogRecordModel): String
     suspend fun updateRecord(record: CatalogRecordModel)
 }

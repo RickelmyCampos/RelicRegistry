@@ -115,22 +115,22 @@ fun DocumentSnapshot.toRecordModel():CatalogRecordModel{
         group = data!!["group"].toString(),
 
         // Typology
-        statueType = data?.let { StatueType.valueOf(it["statueType"].toString()) },
-        condition = data?.let { Condition.valueOf(it["condition"].toString()) },
-        generalBodyShape = data?.let { GeneralBodyShape.valueOf(it["generalBodyShape"].toString()) },
+        statueType = this.getEnumOrNull<StatueType>("statueType"),//this.getEnumOrNull<StatueType>("statueType"),
+        condition =this.getEnumOrNull<Condition>("condition"),
+        generalBodyShape = this.getEnumOrNull<GeneralBodyShape>("generalBodyShape"),
 
         // Portions
         upperLimbs = this.getEnumListOrNull("upperLimbs"),
         lowerLimbs = this.getEnumListOrNull("lowerLimbs"),
 
         // Genitalia
-        genitalia = data?.let { Genitalia.valueOf(it["genitalia"].toString()) },
+        genitalia = this.getEnumOrNull<Genitalia>("genitalia"),
 
         // Dimensions
-        length = data?.get("length").toString().toFloat(),
-        width = data?.get("width").toString().toFloat(),
-        height = data?.get("height").toString().toFloat(),
-        weight = data?.get("weight").toString().toFloat(),
+        length = data?.get("length")?.toString()?.toFloat(),
+        width = data?.get("width")?.toString()?.toFloat(),
+        height = data?.get("height")?.toString()?.toFloat(),
+        weight = data?.get("weight")?.toString()?.toFloat(),
 
         // Technology
         firing = this.getEnumListOrNull("firing"),
@@ -142,7 +142,7 @@ fun DocumentSnapshot.toRecordModel():CatalogRecordModel{
         surfaceTreatmentExternal = this.getEnumListOrNull("surfaceTreatmentExternal"),
 
         // Decoration
-        decorationLocation = data?.let { DecorationLocation.valueOf(it["decorationLocation"].toString()) },
+        decorationLocation = this.getEnumOrNull<DecorationLocation>("decorationLocation"),
         decorationType = this.getEnumListOrNull("decorationType"),
         internalPaintColor = this.getEnumListOrNull("internalPaintColor"),
         externalPaintColor = this.getEnumListOrNull("externalPaintColor"),
@@ -172,4 +172,12 @@ inline fun <reified T : Enum<T>> DocumentSnapshot.getEnumListOrNull(key: String)
             enumValues<T>().firstOrNull { it.name.equals(str, ignoreCase = true) }
         }
     }?: listOf()
+}
+inline  fun <reified T: Enum<T>>  DocumentSnapshot.getEnumOrNull(key: String): T? {
+    val key =this.get(key) as? String
+   return key?.let { strEnum->
+       strEnum.toString().trim().let { str ->
+           enumValues<T>().firstOrNull { it.name.equals(str, ignoreCase = true) }
+       }
+   }
 }
