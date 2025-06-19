@@ -6,6 +6,7 @@ import androidx.room.Room
 import com.gilbersoncampos.relicregistry.data.local.dao.RecordDao
 import com.gilbersoncampos.relicregistry.data.local.database.AppDatabase
 import com.gilbersoncampos.relicregistry.data.local.database.MIGRATION_1_2
+import com.gilbersoncampos.relicregistry.data.local.database.MIGRATION_2_3
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -22,7 +23,7 @@ object DatabaseModule {
         Room.databaseBuilder(
             applicationContext,
             AppDatabase::class.java, "app_database"
-        ).addMigrations(MIGRATION_1_2)
+        ).addMigrations(MIGRATION_1_2, MIGRATION_2_3)
             .build()
     @Provides
     @Singleton

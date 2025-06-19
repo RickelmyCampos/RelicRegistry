@@ -74,7 +74,8 @@ data class CatalogRecordModel(
     // Observations
     val observations: String,
     val hasDecoration: Boolean = false,
-    val createdAt: LocalDateTime? = null
+    val createdAt: LocalDateTime? = null,
+    val idRemote: String? = null
 ) {
     fun generateHeader(): List<String> {
         val result = mutableListOf<String>()

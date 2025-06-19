@@ -35,8 +35,8 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-@Database(entities = [ CatalogRecordEntity::class], version = 2, exportSchema = true,autoMigrations = [
-    AutoMigration (from = 1, to = 2)
+@Database(entities = [ CatalogRecordEntity::class], version = 3, exportSchema = true,autoMigrations = [
+    AutoMigration (from = 1, to = 2), AutoMigration(from = 2,to=3)
 ])
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -53,6 +53,13 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
         val dateString=now?.format(formatter)
         database.execSQL("""
             UPDATE catalog_records SET createdAt = '$dateString'
+        """.trimIndent())
+    }
+}
+val MIGRATION_2_3 = object : Migration(2, 3) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("""
+            ALTER TABLE catalog_records ADD COLUMN idRemote TEXT
         """.trimIndent())
     }
 }

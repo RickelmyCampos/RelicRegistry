@@ -1,0 +1,244 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 3,
+    "identityHash": "fd62c9f97ff512372892ed7f8caa8772",
+    "entities": [
+      {
+        "tableName": "catalog_records",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `listImages` TEXT NOT NULL, `archaeologicalSite` TEXT NOT NULL, `identification` TEXT NOT NULL, `classification` TEXT NOT NULL, `shelfLocation` TEXT NOT NULL, `group` TEXT NOT NULL, `statueType` TEXT, `condition` TEXT, `generalBodyShape` TEXT, `upperLimbs` TEXT NOT NULL, `lowerLimbs` TEXT NOT NULL, `genitalia` TEXT, `length` REAL, `width` REAL, `height` REAL, `weight` REAL, `firing` TEXT NOT NULL, `temper` TEXT NOT NULL, `manufacturingTechnique` TEXT NOT NULL, `manufacturingMarks` TEXT NOT NULL, `usageMarks` TEXT NOT NULL, `surfaceTreatmentInternal` TEXT NOT NULL, `surfaceTreatmentExternal` TEXT NOT NULL, `decorationLocation` TEXT, `decorationType` TEXT NOT NULL, `internalPaintColor` TEXT NOT NULL, `externalPaintColor` TEXT NOT NULL, `plasticDecoration` TEXT NOT NULL, `otherFormalAttributes` TEXT NOT NULL, `bodyPosition` TEXT NOT NULL, `uses` TEXT NOT NULL, `observations` TEXT NOT NULL, `hasDecoration` INTEGER NOT NULL, `createdAt` TEXT, `idRemote` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "listImages",
+            "columnName": "listImages",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "archaeologicalSite",
+            "columnName": "archaeologicalSite",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "identification",
+            "columnName": "identification",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "classification",
+            "columnName": "classification",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "shelfLocation",
+            "columnName": "shelfLocation",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "group",
+            "columnName": "group",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "statueType",
+            "columnName": "statueType",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "condition",
+            "columnName": "condition",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "generalBodyShape",
+            "columnName": "generalBodyShape",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "upperLimbs",
+            "columnName": "upperLimbs",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lowerLimbs",
+            "columnName": "lowerLimbs",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "genitalia",
+            "columnName": "genitalia",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "length",
+            "columnName": "length",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "width",
+            "columnName": "width",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "height",
+            "columnName": "height",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "weight",
+            "columnName": "weight",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "firing",
+            "columnName": "firing",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "temper",
+            "columnName": "temper",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "manufacturingTechnique",
+            "columnName": "manufacturingTechnique",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "manufacturingMarks",
+            "columnName": "manufacturingMarks",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "usageMarks",
+            "columnName": "usageMarks",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "surfaceTreatmentInternal",
+            "columnName": "surfaceTreatmentInternal",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "surfaceTreatmentExternal",
+            "columnName": "surfaceTreatmentExternal",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "decorationLocation",
+            "columnName": "decorationLocation",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "decorationType",
+            "columnName": "decorationType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "internalPaintColor",
+            "columnName": "internalPaintColor",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "externalPaintColor",
+            "columnName": "externalPaintColor",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "plasticDecoration",
+            "columnName": "plasticDecoration",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "otherFormalAttributes",
+            "columnName": "otherFormalAttributes",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "bodyPosition",
+            "columnName": "bodyPosition",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uses",
+            "columnName": "uses",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "observations",
+            "columnName": "observations",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hasDecoration",
+            "columnName": "hasDecoration",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "idRemote",
+            "columnName": "idRemote",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fd62c9f97ff512372892ed7f8caa8772')"
+    ]
+  }
+}

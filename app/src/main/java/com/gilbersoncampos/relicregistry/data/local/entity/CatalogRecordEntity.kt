@@ -65,5 +65,6 @@ data class CatalogRecordEntity(
     // Observations
     val observations: String,
     val hasDecoration: Boolean ,
-    val createdAt: LocalDateTime?
+    val createdAt: LocalDateTime?,
+    val idRemote: String?
 )
