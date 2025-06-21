@@ -72,25 +72,7 @@ import androidx.core.content.ContextCompat.startActivity
 import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.gilbersoncampos.relicregistry.BuildConfig
-import com.gilbersoncampos.relicregistry.Constants.antiplastic
-import com.gilbersoncampos.relicregistry.Constants.bodyPosition
-import com.gilbersoncampos.relicregistry.Constants.burn
-import com.gilbersoncampos.relicregistry.Constants.decorationType
-import com.gilbersoncampos.relicregistry.Constants.fabricationMarks
-import com.gilbersoncampos.relicregistry.Constants.fabricationTechnique
-import com.gilbersoncampos.relicregistry.Constants.formCondition
-import com.gilbersoncampos.relicregistry.Constants.formGeneralBodyShape
-import com.gilbersoncampos.relicregistry.Constants.formTypes
-import com.gilbersoncampos.relicregistry.Constants.location
-import com.gilbersoncampos.relicregistry.Constants.lowerLimbs
-import com.gilbersoncampos.relicregistry.Constants.otherFormalAttributes
-import com.gilbersoncampos.relicregistry.Constants.paintColorFI
-import com.gilbersoncampos.relicregistry.Constants.plasticDecoration
-import com.gilbersoncampos.relicregistry.Constants.surfaceTreatment
-import com.gilbersoncampos.relicregistry.Constants.surfaceTreatmentET
-import com.gilbersoncampos.relicregistry.Constants.upperLimbs
-import com.gilbersoncampos.relicregistry.Constants.usageMarks
-import com.gilbersoncampos.relicregistry.Constants.uses
+
 import com.gilbersoncampos.relicregistry.R
 import com.gilbersoncampos.relicregistry.data.enums.AccessoryType
 import com.gilbersoncampos.relicregistry.data.enums.BodyPosition

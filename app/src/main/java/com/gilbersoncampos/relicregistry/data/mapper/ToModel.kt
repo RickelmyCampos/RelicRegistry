@@ -102,6 +102,7 @@ fun CatalogRecordEntity.toModel(): CatalogRecordModel {
         listImages = this.listImages,
         hasDecoration = this.hasDecoration,
         createdAt = this.createdAt,
+        updatedAt = this.updatedAt,
         idRemote = this.idRemote
 
     )
@@ -159,10 +160,12 @@ fun DocumentSnapshot.toRecordModel():CatalogRecordModel{
 
         // Observations
         observations = data!!["observations"].toString(),
-        id = data!!["id"].toString().toLong(),
+        id = 0,
         listImages = data?.get("listImages") as? List<String> ?: listOf(),
         hasDecoration = data!!["hasDecoration"].toString().toBoolean(),
-        createdAt = data!!["createdAt"].toString().toLocalDateTime()
+        createdAt = data!!["createdAt"].toString().toLocalDateTime(),
+        updatedAt = data!!["updatedAt"].toString().toLocalDateTime(),
+        idRemote = this.id
     )
 }
 inline fun <reified T : Enum<T>> DocumentSnapshot.getEnumListOrNull(key: String): List<T> {

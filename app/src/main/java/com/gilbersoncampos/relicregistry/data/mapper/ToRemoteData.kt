@@ -44,9 +44,9 @@ fun CatalogRecordModel.toRecordRemote(): HashMap<String,Any?> {
 
         "observations" to this.observations,
         "listImages" to this.listImages,
-        "id" to this.id,
         "hasDecoration" to this.hasDecoration,
         "createdAt" to this.createdAt.toString(),
+        "updatedAt" to this.updatedAt.toString(),
     )
 
 }

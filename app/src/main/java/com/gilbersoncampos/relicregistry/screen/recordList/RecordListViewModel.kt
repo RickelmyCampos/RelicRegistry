@@ -51,6 +51,11 @@ class RecordListViewModel @Inject constructor(
         }
 
     }
+    fun syncRecords(){
+        viewModelScope.launch {
+            repository.syncRecords()
+        }
+    }
 
     fun removeRecordsSelected() {
         viewModelScope.launch {

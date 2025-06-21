@@ -10,6 +10,7 @@ import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.gilbersoncampos.relicregistry.Constants.DATE_FORMATER
 import com.gilbersoncampos.relicregistry.data.local.dao.RecordDao
 import com.gilbersoncampos.relicregistry.data.local.entity.CatalogRecordEntity
 import com.gilbersoncampos.relicregistry.data.enums.BodyPosition
@@ -35,8 +36,8 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-@Database(entities = [ CatalogRecordEntity::class], version = 3, exportSchema = true,autoMigrations = [
-    AutoMigration (from = 1, to = 2), AutoMigration(from = 2,to=3)
+@Database(entities = [ CatalogRecordEntity::class], version = 4, exportSchema = true,autoMigrations = [
+    AutoMigration (from = 1, to = 2), AutoMigration(from = 2,to=3),AutoMigration(from =3,to=4)
 ])
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -50,7 +51,7 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
         """.trimIndent())
 
         val now = LocalDateTime.now()
-        val dateString=now?.format(formatter)
+        val dateString=now?.format(DATE_FORMATER)
         database.execSQL("""
             UPDATE catalog_records SET createdAt = '$dateString'
         """.trimIndent())
@@ -63,9 +64,21 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
         """.trimIndent())
     }
 }
-@RequiresApi(Build.VERSION_CODES.O)
-private val formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
+val MIGRATION_3_4 = object : Migration(3, 4) {
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("""
+            ALTER TABLE catalog_records ADD COLUMN updatedAt TEXT
+        """.trimIndent())
 
+        val now = LocalDateTime.now()
+        val dateString=now?.format(DATE_FORMATER)
+        database.execSQL("""
+            UPDATE catalog_records SET updatedAt = '$dateString'
+        """.trimIndent())
+    }
+}
+@RequiresApi(Build.VERSION_CODES.O)
 class Converters {
         @TypeConverter
     fun fromString(value: String): List<String> {
@@ -87,7 +100,7 @@ class Converters {
     @RequiresApi(Build.VERSION_CODES.O)
     @TypeConverter
     fun fromLocalDateTime(dateTime: LocalDateTime?): String? {
-        return dateTime?.format(formatter)
+        return dateTime?.format(DATE_FORMATER)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -95,9 +108,9 @@ class Converters {
     fun toLocalDateTime(value: String?): LocalDateTime? {
         var nValue=value
         if(value?.isDigitsOnly() == true){
-            nValue=Instant.ofEpochMilli(value.toLong()).atZone(ZoneId.systemDefault()).toLocalDateTime().format(formatter)
+            nValue=Instant.ofEpochMilli(value.toLong()).atZone(ZoneId.systemDefault()).toLocalDateTime().format(DATE_FORMATER)
         }
-        return nValue?.let { LocalDateTime.parse(it, formatter) }
+        return nValue?.let { LocalDateTime.parse(it, DATE_FORMATER) }
     }
 //    @TypeConverter
 //    fun fromStringList(value: String): List<String> {

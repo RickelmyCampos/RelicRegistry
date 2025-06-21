@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -18,12 +19,19 @@ import androidx.compose.ui.unit.dp
 import com.gilbersoncampos.relicregistry.ui.theme.RelicRegistryTheme
 
 @Composable
-fun HeaderActionSelect(size:Int,actionRemove:()->Unit) {
+fun HeaderActionSelect(sizeSelected:Int,actionRemove:()->Unit,actionSync:()-> Unit) {
     Row(modifier = Modifier.fillMaxWidth().padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text("$size ${if(size==1)"selecionado" else "selecionados"}")
+        if(sizeSelected>0){
+            Text("$sizeSelected ${if(sizeSelected==1)"selecionado" else "selecionados"}")
+        }
         Spacer(modifier = Modifier.weight(1f))
-        IconButton(actionRemove) {
-            Icon(imageVector = Icons.Default.Delete, contentDescription = "remove icon")
+        IconButton(actionSync) {
+            Icon(imageVector = Icons.Default.Refresh, contentDescription = "sync_refresh icon")
+        }
+        if(sizeSelected>0){
+            IconButton(actionRemove) {
+                Icon(imageVector = Icons.Default.Delete, contentDescription = "remove icon")
+            }
         }
     }
 }
@@ -31,6 +39,13 @@ fun HeaderActionSelect(size:Int,actionRemove:()->Unit) {
 @Preview(showBackground = true)
 fun HeaderActionSelectPreview(){
     RelicRegistryTheme {
-        HeaderActionSelect(2) { }
+        HeaderActionSelect(2,{}) { }
+    }
+}
+@Composable
+@Preview(showBackground = true)
+fun HeaderActionSelectNoItemsSelectedPreview(){
+    RelicRegistryTheme {
+        HeaderActionSelect(0,{}) { }
     }
 }

@@ -4,6 +4,7 @@ import com.gilbersoncampos.relicregistry.data.enums.FormFieldType
 import com.gilbersoncampos.relicregistry.data.model.DropdownData
 import com.gilbersoncampos.relicregistry.data.model.Form
 import com.gilbersoncampos.relicregistry.data.model.FormField
+import java.time.format.DateTimeFormatter
 
 
 object Constants {
@@ -146,5 +147,6 @@ object Constants {
                 FormField(id = "19", label = "Campo8", value = "", typeField = FormFieldType.MULTIPLEOPTIONS, options = "teste1|teste"),
             )
         )
+     val DATE_FORMATER = DateTimeFormatter.ISO_LOCAL_DATE_TIME
 
 }

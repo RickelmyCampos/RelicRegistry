@@ -23,6 +23,9 @@ interface RecordDao {
     @Query("SELECT * FROM catalog_records WHERE id = :id")
     fun getRecordById(id: Long): Flow<CatalogRecordEntity>
 
+    @Query("SELECT * FROM catalog_records WHERE idRemote like :id")
+    fun getRecordByIdRemote(id: String): Flow<CatalogRecordEntity>
+
     @Update
     suspend fun updateRecord(record: CatalogRecordEntity)
 

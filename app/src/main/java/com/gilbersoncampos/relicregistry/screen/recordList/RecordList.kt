@@ -56,7 +56,8 @@ fun RecordListScreen(
         onClickRecord = navigateToEditRecord,
         onSelectRecord = viewModel::selectRecords,
         removeListRecords = viewModel::removeRecordsSelected,
-        getBitmap = viewModel::getImage
+        getBitmap = viewModel::getImage,
+        syncRecords = viewModel::syncRecords
     )
 
 }
@@ -67,7 +68,8 @@ fun RecordListUI(
     onClickRecord: (Long) -> Unit,
     onSelectRecord: (CatalogRecordModel) -> Unit,
     removeListRecords:()->Unit,
-    getBitmap: (String) -> Bitmap
+    getBitmap: (String) -> Bitmap,
+    syncRecords:()-> Unit
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         when (uiState) {
@@ -99,6 +101,8 @@ fun RecordListUI(
                         })
                 }
                 if (uiState.records.isEmpty()) {
+                    HeaderActionSelect(uiState.recordsSelected.size, actionSync = syncRecords,actionRemove = {showDialog=true})
+
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -109,11 +113,9 @@ fun RecordListUI(
                         Text(text = "Nenhuma ficha encontrada, Adicione clicando no botão abaixo")
                     }
                 } else {
-                    if(uiState.recordsSelected.isNotEmpty()){
-                        HeaderActionSelect(uiState.recordsSelected.size){
-                            showDialog=true
-                        }
-                    }
+
+                    HeaderActionSelect(uiState.recordsSelected.size, actionSync = syncRecords,actionRemove = {showDialog=true})
+
                     LazyColumn {
                         items(uiState.records) {
                             RelicItem(
@@ -199,6 +201,6 @@ private fun RelicItem(
 @Composable
 fun RecordListUIPreview() {
     RelicRegistryTheme {
-        RecordListUI(RecordUiState.Loading, {}, {},{}, { BitmapFactory.decodeFile("") })
+        RecordListUI(RecordUiState.Loading, {}, {},{}, { BitmapFactory.decodeFile("") },{})
     }
 }

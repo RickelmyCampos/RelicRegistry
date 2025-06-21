@@ -63,6 +63,7 @@ fun CatalogRecordModel.toEntity(): CatalogRecordEntity {
         id = this.id,
         hasDecoration = this.hasDecoration,
         createdAt = this.createdAt,
+        updatedAt = this.updatedAt,
         idRemote = this.idRemote
     )
 }
