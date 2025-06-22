@@ -4,8 +4,6 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,8 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.FloatingActionButton
@@ -29,7 +25,6 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -45,9 +40,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.gilbersoncampos.relicregistry.data.model.CatalogRecordModel
-import com.gilbersoncampos.relicregistry.data.model.RecordModel
-import com.gilbersoncampos.relicregistry.data.services.ImageStoreService
 import com.gilbersoncampos.relicregistry.navigation.Destination
 import com.gilbersoncampos.relicregistry.navigation.NavGraphHost
 import com.gilbersoncampos.relicregistry.navigation.getIcon
@@ -56,16 +54,22 @@ import com.gilbersoncampos.relicregistry.screen.chart.navigateToCharts
 import com.gilbersoncampos.relicregistry.screen.config.navigateToSettings
 import com.gilbersoncampos.relicregistry.screen.editRecord.navigateToEditRecord
 import com.gilbersoncampos.relicregistry.screen.form.navigateToForm
-import com.gilbersoncampos.relicregistry.screen.home.navigateToHome
 import com.gilbersoncampos.relicregistry.screen.recordList.navigateToRecordList
 import com.gilbersoncampos.relicregistry.ui.theme.RelicRegistryTheme
+import com.gilbersoncampos.relicregistry.worker.SyncWorker
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
+import java.util.concurrent.TimeUnit
+
+
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    companion object {
+        const val UNIQUE_PERIODIC_WORK_NAME = "RelicRegistryPeriodicSync"
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        schedulePeriodicWork()
         setContent {
             RelicRegistryTheme {
                 val viewModel: MainViewModel = hiltViewModel()
@@ -160,6 +164,25 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun schedulePeriodicWork() {
+        val repeatIntervalMinutes: Long = 15
+        val periodicWorkRequest =
+            PeriodicWorkRequestBuilder<SyncWorker>(
+                repeatIntervalMinutes, // Intervalo
+                TimeUnit.MINUTES       // Unidade de tempo
+
+            )
+                 .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
+                .build()
+        WorkManager.getInstance(applicationContext).enqueueUniquePeriodicWork(
+            UNIQUE_PERIODIC_WORK_NAME,
+            ExistingPeriodicWorkPolicy.REPLACE,
+            periodicWorkRequest
+        )
+
+        Log.d("MainActivity", "Trabalho periódico '${UNIQUE_PERIODIC_WORK_NAME}' agendado para cada $repeatIntervalMinutes minutos.")
     }
 }
 

@@ -71,6 +71,7 @@ dependencies {
     implementation(libs.androidx.material3)
     //charts
     implementation("com.github.tehras:charts:0.2.4-alpha")
+    implementation(libs.androidx.hilt.common)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -88,7 +89,8 @@ dependencies {
     //Room
     implementation(libs.androidx.room.runtime)
     annotationProcessor(libs.androidx.room.compiler)
-
+    //workmanager
+    implementation(libs.androidx.work.runtime.ktx)
     //firebase
     implementation(platform("com.google.firebase:firebase-bom:33.15.0"))
     implementation("com.google.firebase:firebase-analytics")
