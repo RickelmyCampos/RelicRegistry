@@ -1,7 +1,9 @@
 package com.gilbersoncampos.relicregistry.data.mapper
 
 import com.gilbersoncampos.relicregistry.data.local.entity.CatalogRecordEntity
+import com.gilbersoncampos.relicregistry.data.local.entity.HistoricSyncEntity
 import com.gilbersoncampos.relicregistry.data.model.CatalogRecordModel
+import com.gilbersoncampos.relicregistry.data.model.HistoricSyncModel
 import com.gilbersoncampos.relicregistry.data.model.RecordModel
 
 
@@ -65,5 +67,15 @@ fun CatalogRecordModel.toEntity(): CatalogRecordEntity {
         createdAt = this.createdAt,
         updatedAt = this.updatedAt,
         idRemote = this.idRemote
+    )
+}
+fun HistoricSyncModel.toEntity(): HistoricSyncEntity {
+    return HistoricSyncEntity(
+        id=this.id,
+        status = this.status.name,
+        data = this.data,
+        errorMessage = this.errorMessage,
+        startIn = this.startIn,
+        endIn = this.endIn
     )
 }

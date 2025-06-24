@@ -16,6 +16,7 @@ sealed class Destination(val route: String, val name: String) {
     data object Settings : Destination("config", "Configuração")
     data object Form : Destination("form", "Formulário")
     data object Charts : Destination("charts", "Gráficos")
+    data object HitoricSync : Destination("historic_sync", "Histórico")
 }
 
 val listBottomNavigation: List<Destination> =
@@ -30,5 +31,6 @@ fun Destination.getIcon(): ImageVector {
         Destination.Settings -> Icons.Default.Settings
         Destination.Form -> Icons.Default.Settings
         Destination.Charts -> ImageVector.vectorResource(R.drawable.ic_chart)
+        else -> Icons.Default.Home
     }
 }

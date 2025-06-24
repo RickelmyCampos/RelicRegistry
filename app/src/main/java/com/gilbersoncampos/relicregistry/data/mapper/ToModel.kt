@@ -21,6 +21,9 @@ import com.gilbersoncampos.relicregistry.data.enums.Temper
 import com.gilbersoncampos.relicregistry.data.enums.UpperLimbs
 import com.gilbersoncampos.relicregistry.data.enums.UsageMarks
 import com.gilbersoncampos.relicregistry.data.enums.Uses
+import com.gilbersoncampos.relicregistry.data.local.entity.HistoricSyncEntity
+import com.gilbersoncampos.relicregistry.data.model.HistoricSyncModel
+import com.gilbersoncampos.relicregistry.data.model.StatusSync
 import com.gilbersoncampos.relicregistry.extensions.toLocalDateTime
 import com.google.firebase.firestore.DocumentSnapshot
 
@@ -106,6 +109,15 @@ fun CatalogRecordEntity.toModel(): CatalogRecordModel {
         idRemote = this.idRemote
 
     )
+}
+fun HistoricSyncEntity.toModel():HistoricSyncModel{
+    return HistoricSyncModel(
+        id=this.id,
+        status=StatusSync.valueOf(this.status),
+        data = this.data,
+        errorMessage = this.errorMessage,
+        startIn = this.startIn,
+        endIn = this.endIn)
 }
 fun DocumentSnapshot.toRecordModel():CatalogRecordModel{
     return CatalogRecordModel(

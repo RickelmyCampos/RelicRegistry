@@ -19,20 +19,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 
 @Composable
-fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
+fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel(),navHostController: NavHostController) {
     val listOptions = viewModel.settingOptions
-    SettingsUi(listOptions, viewModel::onClickOption)
+    SettingsUi(
+        listOptions, viewModel::onClickOption,
+        navHostController = navHostController
+    )
 }
 
 @Composable
-fun SettingsUi(listOptions: List<SettingModel>, onClickOption:(ActionToClick)->Unit) {
+fun SettingsUi(listOptions: List<SettingModel>, onClickOption:(ActionToClick,NavHostController?)->Unit,navHostController: NavHostController?=null) {
     Column(modifier = Modifier.fillMaxSize()) {
         LazyColumn {
             items(listOptions) {
                 SettingOptionComponent(it){
-                    onClickOption(it.action)
+                    onClickOption(it.action,navHostController)
                 }
             }
         }
@@ -56,7 +60,7 @@ fun SettingOptionComponent(option: SettingModel,onClick:()->Unit) {
 @Composable
 @Preview(showBackground = true)
 fun SettingsUiPreview() {
-    SettingsUi(listOf(),{})
+    SettingsUi(listOf(),{_,_->})
 }
 
 @Composable

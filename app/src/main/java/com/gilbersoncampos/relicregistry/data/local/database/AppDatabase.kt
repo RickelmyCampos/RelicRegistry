@@ -29,6 +29,8 @@ import com.gilbersoncampos.relicregistry.data.enums.SurfaceTreatment
 import com.gilbersoncampos.relicregistry.data.enums.Temper
 import com.gilbersoncampos.relicregistry.data.enums.UpperLimbs
 import com.gilbersoncampos.relicregistry.data.enums.UsageMarks
+import com.gilbersoncampos.relicregistry.data.local.dao.HistoricSyncDao
+import com.gilbersoncampos.relicregistry.data.local.entity.HistoricSyncEntity
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.time.Instant
@@ -36,12 +38,13 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-@Database(entities = [ CatalogRecordEntity::class], version = 4, exportSchema = true,autoMigrations = [
+@Database(entities = [ CatalogRecordEntity::class, HistoricSyncEntity::class], version = 5, exportSchema = true,autoMigrations = [
     AutoMigration (from = 1, to = 2), AutoMigration(from = 2,to=3),AutoMigration(from =3,to=4)
 ])
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun recordDao(): RecordDao
+    abstract fun historicDao(): HistoricSyncDao
 }
 val MIGRATION_1_2 = object : Migration(1, 2) {
     @RequiresApi(Build.VERSION_CODES.O)
@@ -75,6 +78,23 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
         val dateString=now?.format(DATE_FORMATER)
         database.execSQL("""
             UPDATE catalog_records SET updatedAt = '$dateString'
+        """.trimIndent())
+    }
+}
+val MIGRATION_4_5 = object : Migration(4, 5) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        // SQL para criar a nova tabela 'historic_sync'
+        // Certifique-se de que os tipos de coluna, notNull constraints e chave primária
+        // correspondam EXATAMENTE à sua HistoricSyncEntity.
+        database.execSQL("""
+            CREATE TABLE IF NOT EXISTS `historic_sync` (
+                `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
+                `data` TEXT NOT NULL, 
+                `startIn` TEXT NOT NULL, 
+                `endIn` TEXT, 
+                `status` TEXT NOT NULL, 
+                `errorMessage` TEXT
+            )
         """.trimIndent())
     }
 }

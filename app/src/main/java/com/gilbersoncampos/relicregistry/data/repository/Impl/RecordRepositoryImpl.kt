@@ -6,7 +6,10 @@ import com.gilbersoncampos.relicregistry.data.local.dao.RecordDao
 import com.gilbersoncampos.relicregistry.data.mapper.toEntity
 import com.gilbersoncampos.relicregistry.data.mapper.toModel
 import com.gilbersoncampos.relicregistry.data.model.CatalogRecordModel
+import com.gilbersoncampos.relicregistry.data.model.HistoricSyncModel
+import com.gilbersoncampos.relicregistry.data.model.StatusSync
 import com.gilbersoncampos.relicregistry.data.remote.RemoteDataSource
+import com.gilbersoncampos.relicregistry.data.repository.HistoricSyncRepository
 import com.gilbersoncampos.relicregistry.data.repository.RecordRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
@@ -14,7 +17,7 @@ import kotlinx.coroutines.flow.flow
 import java.time.LocalDateTime
 import javax.inject.Inject
 
-class RecordRepositoryImpl @Inject constructor(private val recordDao: RecordDao,private val remoteDataSource: RemoteDataSource) :
+class RecordRepositoryImpl @Inject constructor(private val recordDao: RecordDao,private val remoteDataSource: RemoteDataSource,val historicRepository: HistoricSyncRepository) :
     RecordRepository {
     override suspend fun createRecord(record: CatalogRecordModel) {
         recordDao.createRecord(record.toEntity())
@@ -50,13 +53,19 @@ class RecordRepositoryImpl @Inject constructor(private val recordDao: RecordDao,
     }
     override suspend fun syncRecords() {
         Log.d("SYNC", "Iniciando sincronização...")
-        syncLocalToServer()
+        var historic= HistoricSyncModel(id = 0, startIn = LocalDateTime.now(), endIn = null, status = StatusSync.LOADING, data = "")
+        historicRepository.createHistoricSync(historic)
+        historic=historicRepository.getLastHistoricSync()
+        syncLocalToServer(historic)
         Log.d("SYNC", "Registros locais enviados. Buscando registros remotos...")
-        syncServerToLocal()
+        historic=historicRepository.getHistoricSync(historic.id)
+        syncServerToLocal(historic)
+        historic=historicRepository.getHistoricSync(historic.id)
+        historicRepository.updateHistoricSync(historic.copy(endIn = LocalDateTime.now(), status = StatusSync.SUCCESS))
         Log.d("SYNC", "Sincronização concluída.")
     }
 
-    private suspend fun syncServerToLocal() {
+    private suspend fun syncServerToLocal(historic: HistoricSyncModel) {
         val localRecords =
             recordDao.getAllRecord().firstOrNull()?.map { it.toModel() } ?: emptyList()
         try {
@@ -99,10 +108,12 @@ class RecordRepositoryImpl @Inject constructor(private val recordDao: RecordDao,
             }
         } catch (e: Exception) {
             Log.e("SYNC", "Erro ao buscar ou processar registros remotos: ${e.message}", e)
+            val newHistoric=historic.copy(status = StatusSync.ERROR,errorMessage = e.message)
+            historicRepository.updateHistoricSync(newHistoric)
         }
     }
 
-    private suspend fun syncLocalToServer(): List<CatalogRecordModel> {
+    private suspend fun syncLocalToServer(historic: HistoricSyncModel): List<CatalogRecordModel> {
         val localRecords =
             recordDao.getAllRecord().firstOrNull()?.map { it.toModel() } ?: emptyList()
 
@@ -151,6 +162,8 @@ class RecordRepositoryImpl @Inject constructor(private val recordDao: RecordDao,
                     "Erro ao enviar registro local ${localRecord.id} para o servidor: ${e.message}",
                     e
                 )
+                val newHistoric=historic.copy(status = StatusSync.ERROR,errorMessage = e.message)
+                historicRepository.updateHistoricSync(newHistoric)
                 // Considere uma estratégia de retry ou enfileiramento para falhas
             }
         }
