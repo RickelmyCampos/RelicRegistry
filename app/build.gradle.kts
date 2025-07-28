@@ -72,6 +72,7 @@ dependencies {
     //charts
     implementation("com.github.tehras:charts:0.2.4-alpha")
     implementation(libs.androidx.hilt.common)
+    implementation(libs.androidx.hilt.work)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -91,6 +92,7 @@ dependencies {
     annotationProcessor(libs.androidx.room.compiler)
     //workmanager
     implementation(libs.androidx.work.runtime.ktx)
+    kapt("androidx.hilt:hilt-compiler:1.0.0")
     //firebase
     implementation(platform("com.google.firebase:firebase-bom:33.15.0"))
     implementation("com.google.firebase:firebase-analytics")

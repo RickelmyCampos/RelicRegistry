@@ -21,7 +21,7 @@ interface HistoricSyncDao {
     suspend fun updateHistoricSync(record: HistoricSyncEntity)
 
     @Delete
-    suspend fun deleteRecord(record: HistoricSyncEntity)
+    suspend fun deleteHistoricSync(record: HistoricSyncEntity)
 
     @Query("SELECT * FROM historic_sync ORDER BY id DESC LIMIT 1")
     suspend fun getLastHistoricSync():HistoricSyncEntity

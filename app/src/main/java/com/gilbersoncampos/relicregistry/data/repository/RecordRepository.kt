@@ -1,7 +1,9 @@
 package com.gilbersoncampos.relicregistry.data.repository
 
 import com.gilbersoncampos.relicregistry.data.model.CatalogRecordModel
+import com.gilbersoncampos.relicregistry.data.model.HistoricSyncModel
 import com.gilbersoncampos.relicregistry.data.model.RecordModel
+import com.gilbersoncampos.relicregistry.worker.HistoricListener
 import kotlinx.coroutines.flow.Flow
 
 interface RecordRepository{
@@ -12,5 +14,5 @@ interface RecordRepository{
     suspend fun updateRecord(record: CatalogRecordModel)
     suspend fun removeRecords(recordList:List<CatalogRecordModel>)
     suspend fun getAllArchaeologicalSite():Flow<List<String>>
-    suspend fun syncRecords()
+    suspend fun syncRecords(listener: HistoricListener)
 }

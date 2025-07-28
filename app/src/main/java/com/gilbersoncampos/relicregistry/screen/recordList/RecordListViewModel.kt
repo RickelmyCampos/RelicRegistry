@@ -5,8 +5,11 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gilbersoncampos.relicregistry.data.model.CatalogRecordModel
+import com.gilbersoncampos.relicregistry.data.model.HistoricSyncModel
+import com.gilbersoncampos.relicregistry.data.repository.HistoricSyncRepository
 import com.gilbersoncampos.relicregistry.data.repository.RecordRepository
 import com.gilbersoncampos.relicregistry.data.services.ImageStoreService
+import com.gilbersoncampos.relicregistry.worker.HistoricListener
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,7 +21,8 @@ import javax.inject.Inject
 @HiltViewModel
 class RecordListViewModel @Inject constructor(
     private val repository: RecordRepository,
-    private val imageStoreService: ImageStoreService
+    private val imageStoreService: ImageStoreService,
+    private val historicRepository: HistoricSyncRepository
 ) :
     ViewModel() {
     private var _uiState = MutableStateFlow<RecordUiState>(RecordUiState.Loading)
@@ -52,8 +56,13 @@ class RecordListViewModel @Inject constructor(
 
     }
     fun syncRecords(){
+        val listener= object : HistoricListener {
+            override suspend fun updateHistoric(historicSyncModel: HistoricSyncModel) {
+                historicRepository.updateHistoricSync(historicSyncModel)
+            }
+        }
         viewModelScope.launch {
-            repository.syncRecords()
+            repository.syncRecords(listener)
         }
     }
 

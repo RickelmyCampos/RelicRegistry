@@ -1,6 +1,7 @@
 package com.gilbersoncampos.relicregistry.screen.editRecord
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
@@ -106,6 +107,7 @@ import com.gilbersoncampos.relicregistry.ui.components.Session
 import com.gilbersoncampos.relicregistry.ui.components.SubSession
 import com.gilbersoncampos.relicregistry.ui.components.TextCheckbox
 import com.gilbersoncampos.relicregistry.ui.components.TextRadioButton
+import com.gilbersoncampos.relicregistry.ui.theme.RelicRegistryTheme
 import java.time.format.DateTimeFormatter
 import kotlin.math.round
 
@@ -760,7 +762,10 @@ private fun InfosRow(title: String, value: String) {
 
 @Composable
 @Preview(showBackground = true)
+@Preview(showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,)
 fun EditRecordPreview() {
+    RelicRegistryTheme{
     EditRecordUi(
         uiState = EditRecordUiState.Loading,
         updateRecord = { },
@@ -769,12 +774,15 @@ fun EditRecordPreview() {
         onBack = {},
         generatePdf = {}
     )
+    }
 }
 
 @Composable
 @Preview(showBackground = true)
+@Preview(showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,)
 fun EditRecordFormPreview() {
-    MaterialTheme {
+    RelicRegistryTheme {
         EditRecordForm(uiState =
         SuccessUiState(
             record = CatalogRecordModel(

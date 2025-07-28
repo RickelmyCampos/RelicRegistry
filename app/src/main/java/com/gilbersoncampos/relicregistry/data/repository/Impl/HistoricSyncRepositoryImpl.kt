@@ -12,6 +12,10 @@ import javax.inject.Inject
 
 class HistoricSyncRepositoryImpl @Inject constructor(val historycDao: HistoricSyncDao): HistoricSyncRepository {
     override suspend fun createHistoricSync(historic: HistoricSyncModel) {
+        val list=getAllHistoricSync().firstOrNull()?: emptyList()
+        if(list.size >= 20){
+            historycDao.deleteHistoricSync(list.first().toEntity())
+        }
         historycDao.createHistoricSync(historic.toEntity())
     }
 

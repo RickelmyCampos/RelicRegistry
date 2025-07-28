@@ -2,6 +2,7 @@ package com.gilbersoncampos.relicregistry.data.repository.Impl
 
 import android.util.Log
 import com.gilbersoncampos.relicregistry.Constants.DATE_FORMATER
+import com.gilbersoncampos.relicregistry.builder.JsonBuilder
 import com.gilbersoncampos.relicregistry.data.local.dao.RecordDao
 import com.gilbersoncampos.relicregistry.data.mapper.toEntity
 import com.gilbersoncampos.relicregistry.data.mapper.toModel
@@ -11,6 +12,7 @@ import com.gilbersoncampos.relicregistry.data.model.StatusSync
 import com.gilbersoncampos.relicregistry.data.remote.RemoteDataSource
 import com.gilbersoncampos.relicregistry.data.repository.HistoricSyncRepository
 import com.gilbersoncampos.relicregistry.data.repository.RecordRepository
+import com.gilbersoncampos.relicregistry.worker.HistoricListener
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
@@ -51,21 +53,24 @@ class RecordRepositoryImpl @Inject constructor(private val recordDao: RecordDao,
     override suspend fun getAllArchaeologicalSite(): Flow<List<String>> {
        return flow { recordDao.getAllArchaeologicalSite().collect{emit(it)} }
     }
-    override suspend fun syncRecords() {
+    override suspend fun syncRecords(listener: HistoricListener) {
+        val builder= JsonBuilder.Builder().addMessage("Iniciando sincronização...")
         Log.d("SYNC", "Iniciando sincronização...")
         var historic= HistoricSyncModel(id = 0, startIn = LocalDateTime.now(), endIn = null, status = StatusSync.LOADING, data = "")
         historicRepository.createHistoricSync(historic)
         historic=historicRepository.getLastHistoricSync()
-        syncLocalToServer(historic)
+        syncLocalToServer(historic,listener,builder)
+        builder.addMessage("Registros locais enviados. Buscando registros remotos...")
         Log.d("SYNC", "Registros locais enviados. Buscando registros remotos...")
         historic=historicRepository.getHistoricSync(historic.id)
-        syncServerToLocal(historic)
+        syncServerToLocal(historic,listener,builder)
         historic=historicRepository.getHistoricSync(historic.id)
-        historicRepository.updateHistoricSync(historic.copy(endIn = LocalDateTime.now(), status = StatusSync.SUCCESS))
+        builder.addMessage("Sincronização concluída.")
+        listener.updateHistoric(historic.copy(endIn = LocalDateTime.now(), status = StatusSync.SUCCESS, data = builder.build()))
         Log.d("SYNC", "Sincronização concluída.")
     }
 
-    private suspend fun syncServerToLocal(historic: HistoricSyncModel) {
+    private suspend fun syncServerToLocal(historic: HistoricSyncModel,listener: HistoricListener,builder: JsonBuilder) {
         val localRecords =
             recordDao.getAllRecord().firstOrNull()?.map { it.toModel() } ?: emptyList()
         try {
@@ -80,6 +85,7 @@ class RecordRepositoryImpl @Inject constructor(private val recordDao: RecordDao,
 
                 if (existingLocalRecord == null) {
                     // Registro existe no servidor, mas não localmente -> Adicionar localmente
+                    builder.addMessage("Baixando novo registro do servidor: ${remoteRecord.idRemote}")
                     Log.d("SYNC", "Baixando novo registro do servidor: ${remoteRecord.idRemote}")
                     recordDao.createRecord(remoteRecord.toEntity()) // Assume que o id local será gerado automaticamente
                     // ou que toEntity() lida com id local nulo para inserção.
@@ -108,18 +114,20 @@ class RecordRepositoryImpl @Inject constructor(private val recordDao: RecordDao,
             }
         } catch (e: Exception) {
             Log.e("SYNC", "Erro ao buscar ou processar registros remotos: ${e.message}", e)
+            builder.addMessage("Erro ao buscar ou processar registros remotos: ${e.message}")
             val newHistoric=historic.copy(status = StatusSync.ERROR,errorMessage = e.message)
-            historicRepository.updateHistoricSync(newHistoric)
+            listener.updateHistoric(newHistoric)
         }
     }
 
-    private suspend fun syncLocalToServer(historic: HistoricSyncModel): List<CatalogRecordModel> {
+    private suspend fun syncLocalToServer(historic: HistoricSyncModel,listener: HistoricListener,builder: JsonBuilder): List<CatalogRecordModel> {
         val localRecords =
             recordDao.getAllRecord().firstOrNull()?.map { it.toModel() } ?: emptyList()
 
         for (localRecord in localRecords) {
             try {
                 if (localRecord.idRemote == null) {
+                    builder.addMessage("Criando registro local ${localRecord.id} no servidor...")
                     Log.d("SYNC", "Criando registro local ${localRecord.id} no servidor...")
                     // Supondo que seu RemoteDataSource tenha um createRecordRemote que retorna o ID remoto
                     val remoteId =
@@ -127,15 +135,10 @@ class RecordRepositoryImpl @Inject constructor(private val recordDao: RecordDao,
                     if (remoteId != null) {
                         // Atualiza o registro local com o ID remoto
                         recordDao.updateRecord(localRecord.copy(idRemote = remoteId).toEntity())
-                        Log.d(
-                            "SYNC",
-                            "Registro local ${localRecord.id} atualizado com idRemote: $remoteId"
-                        )
+                        builder.addMessage("Registro local ${localRecord.id} atualizado com idRemote: $remoteId")
+
                     } else {
-                        Log.w(
-                            "SYNC",
-                            "Falha ao obter idRemote para o registro local ${localRecord.id}"
-                        )
+                        builder.addMessage("Falha ao obter idRemote para o registro local ${localRecord.id}")
                     }
                 } else {
                     Log.d(
@@ -148,6 +151,8 @@ class RecordRepositoryImpl @Inject constructor(private val recordDao: RecordDao,
                             "SYNC",
                             "Atualizando ${localRecord.id} para o remoto (remoto ${localRecord.idRemote}) no servidor..."
                         )
+                        builder.addMessage("Atualizando ${localRecord.id} para o remoto (remoto ${localRecord.idRemote}) no servidor...")
+
                         remoteDataSource.updateRecord(localRecord)
                     }
                     //verificação de updated.
@@ -162,8 +167,10 @@ class RecordRepositoryImpl @Inject constructor(private val recordDao: RecordDao,
                     "Erro ao enviar registro local ${localRecord.id} para o servidor: ${e.message}",
                     e
                 )
+                builder.addMessage("Erro ao enviar registro local ${localRecord.id} para o servidor: ${e.message}")
+
                 val newHistoric=historic.copy(status = StatusSync.ERROR,errorMessage = e.message)
-                historicRepository.updateHistoricSync(newHistoric)
+                listener.updateHistoric(newHistoric)
                 // Considere uma estratégia de retry ou enfileiramento para falhas
             }
         }
