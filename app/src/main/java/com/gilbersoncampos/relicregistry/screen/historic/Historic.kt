@@ -80,15 +80,16 @@ fun HistoricScreen(viewModel: HistoricViewModel = hiltViewModel()) {
         }
 
     }
-    val context = LocalContext.current
-    var builder = NotificationCompat.Builder(context, "MeuCanal")
-        .setSmallIcon(R.drawable.ic_check_outline)
-        .setContentTitle("Notifica")
-        .setContentText("esta sendo notificado")
-        .setPriority(NotificationCompat.PRIORITY_LOW)
-    Button(onClick = {
-        openNotify(context,builder)
-    }) { Text("Abrir notificação") }
+    //TODO ALGO A FAZER
+//    val context = LocalContext.current
+//    var builder = NotificationCompat.Builder(context, "MeuCanal")
+//        .setSmallIcon(R.drawable.ic_check_outline)
+//        .setContentTitle("Notifica")
+//        .setContentText("esta sendo notificado")
+//        .setPriority(NotificationCompat.PRIORITY_LOW)
+//    Button(onClick = {
+//        openNotify(context,builder)
+//    }) { Text("Abrir notificação") }
 }
 private fun openNotify(context: Context, builder: NotificationCompat.Builder){
     with(NotificationManagerCompat.from(context)) {

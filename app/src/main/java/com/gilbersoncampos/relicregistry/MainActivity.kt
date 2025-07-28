@@ -75,8 +75,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        createNotificationChannel()
-        schedulePeriodicWork()
+        //TODO "Finalizar implementacao"
+//        createNotificationChannel()
+//        schedulePeriodicWork()
 
         setContent {
             RelicRegistryTheme {

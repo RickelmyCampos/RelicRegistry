@@ -25,9 +25,10 @@ fun HeaderActionSelect(sizeSelected:Int,actionRemove:()->Unit,actionSync:()-> Un
             Text("$sizeSelected ${if(sizeSelected==1)"selecionado" else "selecionados"}")
         }
         Spacer(modifier = Modifier.weight(1f))
-        IconButton(actionSync) {
-            Icon(imageVector = Icons.Default.Refresh, contentDescription = "sync_refresh icon")
-        }
+        //TODO "Finalizar implementacao"
+//        IconButton(actionSync) {
+//            Icon(imageVector = Icons.Default.Refresh, contentDescription = "sync_refresh icon")
+//        }
         if(sizeSelected>0){
             IconButton(actionRemove) {
                 Icon(imageVector = Icons.Default.Delete, contentDescription = "remove icon")
