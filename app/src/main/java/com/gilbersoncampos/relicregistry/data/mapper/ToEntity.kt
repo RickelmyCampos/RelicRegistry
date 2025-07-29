@@ -20,6 +20,7 @@ fun CatalogRecordModel.toEntity(): CatalogRecordEntity {
         statueType = this.statueType?.name,
         condition = this.condition?.name,
         generalBodyShape = this.generalBodyShape?.name,
+        interiorCondition = this.interiorCondition?.name,
 
         // Portions
         upperLimbs = this.upperLimbs.joinToString(","),

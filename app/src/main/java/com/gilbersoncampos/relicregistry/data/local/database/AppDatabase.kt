@@ -38,8 +38,8 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-@Database(entities = [ CatalogRecordEntity::class, HistoricSyncEntity::class], version = 5, exportSchema = true,autoMigrations = [
-    AutoMigration (from = 1, to = 2), AutoMigration(from = 2,to=3),AutoMigration(from =3,to=4)
+@Database(entities = [ CatalogRecordEntity::class, HistoricSyncEntity::class], version = 6, exportSchema = true,autoMigrations = [
+    AutoMigration (from = 1, to = 2), AutoMigration(from = 2,to=3),AutoMigration(from =3,to=4),AutoMigration(from=5,to=6)
 ])
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -95,6 +95,13 @@ val MIGRATION_4_5 = object : Migration(4, 5) {
                 `status` TEXT NOT NULL, 
                 `errorMessage` TEXT
             )
+        """.trimIndent())
+    }
+}
+val MIGRATION_5_6 = object : Migration(5, 6) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("""
+            ALTER TABLE catalog_records ADD COLUMN interiorCondition TEXT
         """.trimIndent())
     }
 }

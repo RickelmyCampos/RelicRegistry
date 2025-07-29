@@ -23,6 +23,7 @@ data class CatalogRecordEntity(
     val statueType: String?,
     val condition: String?,
     val generalBodyShape: String?,
+    val interiorCondition: String?,
 
     // Portions
     val upperLimbs: String,

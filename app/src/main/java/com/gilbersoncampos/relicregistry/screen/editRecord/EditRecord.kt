@@ -33,6 +33,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -84,6 +86,7 @@ import com.gilbersoncampos.relicregistry.data.enums.DecorationType
 import com.gilbersoncampos.relicregistry.data.enums.Firing
 import com.gilbersoncampos.relicregistry.data.enums.GeneralBodyShape
 import com.gilbersoncampos.relicregistry.data.enums.Genitalia
+import com.gilbersoncampos.relicregistry.data.enums.InteriorCondition
 import com.gilbersoncampos.relicregistry.data.enums.LowerLimbs
 import com.gilbersoncampos.relicregistry.data.enums.ManufacturingMarks
 import com.gilbersoncampos.relicregistry.data.enums.ManufacturingTechnique
@@ -100,6 +103,7 @@ import com.gilbersoncampos.relicregistry.extensions.toBrDateTime
 import com.gilbersoncampos.relicregistry.extensions.toOnlyFloat
 import com.gilbersoncampos.relicregistry.ui.components.Accordion
 import com.gilbersoncampos.relicregistry.ui.components.AlertDialogCustom
+import com.gilbersoncampos.relicregistry.ui.components.CreateEditRecordModal
 import com.gilbersoncampos.relicregistry.ui.components.CustomDropdown
 import com.gilbersoncampos.relicregistry.ui.components.ImageCarrousel
 import com.gilbersoncampos.relicregistry.ui.components.ListCheckbox
@@ -212,8 +216,17 @@ fun EditRecordForm(
     onBack: () -> Unit
 ) {
     var showDialog by remember { mutableStateOf(false) }
+    var showEditDialog by remember { mutableStateOf(false) }
     BackHandler(enabled = !uiState.isSynchronized) {
         showDialog = true
+    }
+    if (showEditDialog) {
+        CreateEditRecordModal(onCreate = { numbering, place, shelf, group ->
+            updateRecord(uiState.record.copy( identification = numbering, archaeologicalSite = place, shelfLocation = shelf, group = group))
+            showEditDialog = false
+        }, defaultValues = uiState.record ,isEditing = true) {
+            showEditDialog = false
+        }
     }
     if (showDialog) {
         AlertDialogCustom(
@@ -284,7 +297,7 @@ fun EditRecordForm(
                     Text(text = "Gerar Pdf")
                 }
             }
-            Sessions(uiState, updateRecord)
+            Sessions(uiState, updateRecord,{showEditDialog=true})
         }
 
     }
@@ -362,9 +375,11 @@ private fun FullScreenImageDialog(bitmap: Bitmap, onDismiss: () -> Unit) {
 @Composable
 private fun Sessions(
     uiState: SuccessUiState,
-    updateRecord: (CatalogRecordModel) -> Unit
+    updateRecord: (CatalogRecordModel) -> Unit,
+    openEditingModal: () -> Unit
 ) {
-    Session(title = "Dados da Ficha", modifier = Modifier.padding(16.dp)) {
+    Session(title = "Dados da Ficha", modifier = Modifier.padding(16.dp), edit = openEditingModal) {
+
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             InfosRow(title = "Numeração:", value = uiState.record.identification)
             InfosRow(title = "Sítio arqueológico:", value = uiState.record.archaeologicalSite)
@@ -644,6 +659,15 @@ private fun TopologySession(
                         updateRecord(uiState.copy(generalBodyShape = it))
                     })
             }
+            SubSession(title = "Condição Interna") {
+                CustomDropdown(
+                    title = "Condição Interna",
+                    list = InteriorCondition.entries,
+                    selectedState = uiState.interiorCondition,
+                    onSelect = {
+                        updateRecord(uiState.copy(interiorCondition = it))
+                    })
+            }
         }
 
 
@@ -725,7 +749,7 @@ private fun DimensionSession(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
                 OutlinedTextField(
-                    label = { Text(text = "Peso (kg)") },
+                    label = { Text(text = "Peso (g)") },
                     value = weight,
                     onValueChange = { newValue ->
                         if (newValue.all { it.isDigit() || it == '.' }) {

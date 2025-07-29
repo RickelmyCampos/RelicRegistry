@@ -9,6 +9,7 @@ import com.gilbersoncampos.relicregistry.data.enums.FilterEnum
 import com.gilbersoncampos.relicregistry.data.enums.Firing
 import com.gilbersoncampos.relicregistry.data.enums.GeneralBodyShape
 import com.gilbersoncampos.relicregistry.data.enums.Genitalia
+import com.gilbersoncampos.relicregistry.data.enums.InteriorCondition
 import com.gilbersoncampos.relicregistry.data.enums.LowerLimbs
 import com.gilbersoncampos.relicregistry.data.enums.ManufacturingMarks
 import com.gilbersoncampos.relicregistry.data.enums.ManufacturingTechnique
@@ -41,6 +42,7 @@ data class CatalogRecordModel(
     val statueType: StatueType? = null,
     val condition: Condition? = null,
     val generalBodyShape: GeneralBodyShape? = null,
+    val interiorCondition: InteriorCondition? = null,
     // Portions
     val upperLimbs: List<UpperLimbs> = listOf(),
     val lowerLimbs: List<LowerLimbs> = listOf(),

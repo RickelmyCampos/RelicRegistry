@@ -9,6 +9,7 @@ import com.gilbersoncampos.relicregistry.data.enums.FilterEnum
 import com.gilbersoncampos.relicregistry.data.enums.Firing
 import com.gilbersoncampos.relicregistry.data.enums.GeneralBodyShape
 import com.gilbersoncampos.relicregistry.data.enums.Genitalia
+import com.gilbersoncampos.relicregistry.data.enums.InteriorCondition
 import com.gilbersoncampos.relicregistry.data.enums.LowerLimbs
 import com.gilbersoncampos.relicregistry.data.enums.ManufacturingMarks
 import com.gilbersoncampos.relicregistry.data.enums.ManufacturingTechnique
@@ -29,6 +30,7 @@ fun Enum<*>.getNameTranslated(): String {
             PaintColor.CREAM_BEIGE -> "Creme/Bege"
             PaintColor.OTHER -> "Outra"
             PaintColor.UNIDENTIFIED -> "Não identificado"
+            PaintColor.RED -> "Vermelho"
         }
 
         is StatueType -> when (this) {
@@ -55,6 +57,12 @@ fun Enum<*>.getNameTranslated(): String {
             GeneralBodyShape.GLOBULAR -> "Globular"
             GeneralBodyShape.TRAPEZOIDAL -> "Trapezoidal"
             GeneralBodyShape.PHALLIC -> "Fálica"
+            GeneralBodyShape.UNIDENTIFIED -> "Não Identificado"
+        }
+        is InteriorCondition -> when (this) {
+            InteriorCondition.SOLID->"Maciça"
+            InteriorCondition.HOLLOW->"Oca"
+
         }
 
         is UpperLimbs -> when (this) {
@@ -163,6 +171,7 @@ fun Enum<*>.getNameTranslated(): String {
             PlasticDecoration.PERFORATED_HOLE ->  "Orifício vazado"
             PlasticDecoration.NON_PERFORATED_HOLE -> "Orifício não vazado"
             PlasticDecoration.HANDLE -> "Alça"
+            PlasticDecoration.APPLIQUE -> "Aplique"
         }
 
         is AccessoryType -> when (this) {
@@ -183,8 +192,9 @@ fun Enum<*>.getNameTranslated(): String {
             BodyPosition.STANDING_PROFILE -> "Em pé (Perfil)"
             BodyPosition.DUAL_PERSPECTIVE -> "Perspectiva dual"
             BodyPosition.ARMS_AWAY_FROM_THE_BODY -> "Braços afastados do corpo"
-            BodyPosition.SEATED -> "Sentado"
             BodyPosition.ARMS_CLOSE_TO_THE_BODY -> "Braços colados ao corpo"
+            BodyPosition.SEATED_FRONTAL -> "Sentado (Frontal)"
+            BodyPosition.SEATED_PROFILE ->"Sentado (Perfil)"
         }
 
         is Uses -> when (this) {

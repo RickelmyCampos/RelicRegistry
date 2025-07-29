@@ -10,6 +10,7 @@ import com.gilbersoncampos.relicregistry.data.enums.DecorationType
 import com.gilbersoncampos.relicregistry.data.enums.Firing
 import com.gilbersoncampos.relicregistry.data.enums.GeneralBodyShape
 import com.gilbersoncampos.relicregistry.data.enums.Genitalia
+import com.gilbersoncampos.relicregistry.data.enums.InteriorCondition
 import com.gilbersoncampos.relicregistry.data.enums.LowerLimbs
 import com.gilbersoncampos.relicregistry.data.enums.ManufacturingMarks
 import com.gilbersoncampos.relicregistry.data.enums.ManufacturingTechnique
@@ -37,17 +38,14 @@ fun CatalogRecordEntity.toModel(): CatalogRecordModel {
         group = this.group,
 
         // Typology
-        statueType = this.statueType?.let { StatueType.valueOf(it) },
-        condition = this.condition?.let { Condition.valueOf(it) },
-        generalBodyShape = this.generalBodyShape?.let { GeneralBodyShape.valueOf(it) },
+        statueType = this.statueType.getEnumOrNull<StatueType>(),
+        condition = this.condition.getEnumOrNull<Condition>(),
+        generalBodyShape = this.generalBodyShape.getEnumOrNull<GeneralBodyShape>(),
+        interiorCondition = this.interiorCondition.getEnumOrNull<InteriorCondition>(),
 
         // Portions
-        upperLimbs = this.upperLimbs.takeIf { it.isNotEmpty() }
-            ?.split(",")
-            ?.map { UpperLimbs.valueOf(it.trim()) }
-            ?: listOf(),
-        lowerLimbs = this.lowerLimbs.takeIf { it.isNotEmpty() }?.split(",")
-            ?.map { LowerLimbs.valueOf(it.trim()) } ?: listOf(),
+        upperLimbs = this.upperLimbs.takeIf { it.isNotEmpty() }?.split(",").getEnumListOrNull<UpperLimbs>(),
+        lowerLimbs = this.lowerLimbs.takeIf { it.isNotEmpty() }?.split(",").getEnumListOrNull<LowerLimbs>(),
 
         // Genitalia
         genitalia = this.genitalia?.let { Genitalia.valueOf(it) },
@@ -59,45 +57,29 @@ fun CatalogRecordEntity.toModel(): CatalogRecordModel {
         weight = this.weight,
 
         // Technology
-        firing = this.firing.takeIf { it.isNotEmpty() }?.split(",")
-            ?.map { Firing.valueOf(it.trim()) } ?: listOf(),
-        temper = this.temper.takeIf { it.isNotEmpty() }?.split(",")
-            ?.map { Temper.valueOf(it.trim()) } ?: listOf(),
-        manufacturingTechnique = this.manufacturingTechnique.takeIf { it.isNotEmpty() }?.split(",")
-            ?.map { ManufacturingTechnique.valueOf(it.trim()) } ?: listOf(),
-        manufacturingMarks = this.manufacturingMarks.takeIf { it.isNotEmpty() }?.split(",")
-            ?.map { ManufacturingMarks.valueOf(it.trim()) } ?: listOf(),
-        usageMarks = this.usageMarks.takeIf { it.isNotEmpty() }?.split(",")
-            ?.map { UsageMarks.valueOf(it.trim()) } ?: listOf(),
-        surfaceTreatmentInternal = this.surfaceTreatmentInternal.takeIf { it.isNotEmpty() }
-            ?.split(",")
-            ?.map { SurfaceTreatment.valueOf(it.trim()) } ?: listOf(),
-        surfaceTreatmentExternal = this.surfaceTreatmentExternal.takeIf { it.isNotEmpty() }
-            ?.split(",")
-            ?.map { SurfaceTreatment.valueOf(it.trim()) } ?: listOf(),
+        firing = this.firing.takeIf { it.isNotEmpty() }?.split(",").getEnumListOrNull<Firing>(),
+        temper = this.temper.takeIf { it.isNotEmpty() }?.split(",").getEnumListOrNull<Temper>(),
+        manufacturingTechnique = this.manufacturingTechnique.takeIf { it.isNotEmpty() }?.split(",").getEnumListOrNull<ManufacturingTechnique>(),
+        manufacturingMarks = this.manufacturingMarks.takeIf { it.isNotEmpty() }?.split(",").getEnumListOrNull<ManufacturingMarks>(),
+        usageMarks = this.usageMarks.takeIf { it.isNotEmpty() }?.split(",").getEnumListOrNull<UsageMarks>(),
+        surfaceTreatmentInternal = this.surfaceTreatmentInternal.takeIf { it.isNotEmpty() }?.split(",").getEnumListOrNull<SurfaceTreatment>(),
+        surfaceTreatmentExternal = this.surfaceTreatmentExternal.takeIf { it.isNotEmpty() }?.split(",").getEnumListOrNull<SurfaceTreatment>(),
 
         // Decoration
-        decorationLocation = this.decorationLocation?.let { DecorationLocation.valueOf(it) },
-        decorationType = this.decorationType.takeIf { it.isNotEmpty() }?.split(",")
-            ?.map { DecorationType.valueOf(it.trim()) } ?: listOf(),
-        internalPaintColor = this.internalPaintColor.takeIf { it.isNotEmpty() }?.split(",")
-            ?.map { PaintColor.valueOf(it.trim()) } ?: listOf(),
-        externalPaintColor = this.externalPaintColor.takeIf { it.isNotEmpty() }?.split(",")
-            ?.map { PaintColor.valueOf(it.trim()) } ?: listOf(),
-        plasticDecoration = this.plasticDecoration.takeIf { it.isNotEmpty() }?.split(",")
-            ?.map { PlasticDecoration.valueOf(it.trim()) } ?: listOf(),
+        decorationLocation = this.decorationLocation.getEnumOrNull<DecorationLocation>(),
+        decorationType = this.decorationType.takeIf { it.isNotEmpty() }?.split(",").getEnumListOrNull<DecorationType>(),
+        internalPaintColor = this.internalPaintColor.takeIf { it.isNotEmpty() }?.split(",").getEnumListOrNull<PaintColor>(),
+        externalPaintColor = this.externalPaintColor.takeIf { it.isNotEmpty() }?.split(",").getEnumListOrNull<PaintColor>(),
+        plasticDecoration = this.plasticDecoration.takeIf { it.isNotEmpty() }?.split(",").getEnumListOrNull<PlasticDecoration>(),
 
         // Other Formal Attributes
-        otherFormalAttributes = this.otherFormalAttributes.takeIf { it.isNotEmpty() }?.split(",")
-            ?.map { AccessoryType.valueOf(it.trim()) } ?: listOf(),
+        otherFormalAttributes = this.otherFormalAttributes.takeIf { it.isNotEmpty() }?.split(",").getEnumListOrNull<AccessoryType>(),
 
         // Body Position
-        bodyPosition = this.bodyPosition.takeIf { it.isNotEmpty() }?.split(",")
-            ?.map { BodyPosition.valueOf(it.trim()) } ?: listOf(),
+        bodyPosition = this.bodyPosition.takeIf { it.isNotEmpty() }?.split(",").getEnumListOrNull<BodyPosition>(),
 
         // Uses
-        uses = this.uses.takeIf { it.isNotEmpty() }?.split(",")?.map { Uses.valueOf(it.trim()) }
-            ?: listOf(),
+        uses = this.uses.takeIf { it.isNotEmpty() }?.split(",").getEnumListOrNull<Uses>(),
 
         // Observations
         observations = this.observations,
@@ -195,4 +177,29 @@ inline  fun <reified T: Enum<T>>  DocumentSnapshot.getEnumOrNull(key: String): T
            enumValues<T>().firstOrNull { it.name.equals(str, ignoreCase = true) }
        }
    }
+}
+
+inline fun <reified T : Enum<T>> List<String>?.getEnumListOrNull(): List<T> {
+    val rawList = this
+    return try {
+        rawList?.mapNotNull { item ->
+            item.trim().let { str ->
+                enumValues<T>().firstOrNull { it.name.equals(str, ignoreCase = true) }
+            }
+        }?: listOf()
+    }catch (e:Exception){
+        listOf()
+    }
+
+}
+inline  fun <reified T: Enum<T>>  String?.getEnumOrNull(): T? {
+    val key =this
+    return try{ key.let { strEnum->
+        strEnum.toString().trim().let { str ->
+            enumValues<T>().firstOrNull { it.name.equals(str, ignoreCase = true) }
+        }
+    }
+    }catch (e:Exception){
+        null
+    }
 }
