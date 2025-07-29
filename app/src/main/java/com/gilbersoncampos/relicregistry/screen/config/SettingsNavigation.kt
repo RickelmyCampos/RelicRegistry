@@ -7,9 +7,9 @@ import androidx.navigation.compose.composable
 import com.gilbersoncampos.relicregistry.navigation.Destination
 
 val ROUTE = Destination.Settings.route
-fun NavGraphBuilder.settingsScreen(navHostController: NavHostController) {
+fun NavGraphBuilder.settingsScreen(navHostController: NavHostController,onVerifyUpdate:()->Unit) {
     composable(route = ROUTE) {
-        SettingsScreen(navHostController=navHostController)
+        SettingsScreen(navHostController=navHostController, onVerifyUpdate =onVerifyUpdate )
     }
 }
 

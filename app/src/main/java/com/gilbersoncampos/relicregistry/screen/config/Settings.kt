@@ -14,6 +14,9 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,11 +25,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 
 @Composable
-fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel(),navHostController: NavHostController) {
-    val listOptions = viewModel.settingOptions
+fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel(),navHostController: NavHostController,onVerifyUpdate:()->Unit) {
+    val listOptions by viewModel.settingOptions.collectAsState()
+    LaunchedEffect(Unit) {
+        viewModel.addOption(SettingModel("Verificar Atualizações",ActionToClick.Default{onVerifyUpdate()}))
+    }
     SettingsUi(
         listOptions, viewModel::onClickOption,
-        navHostController = navHostController
+        navHostController = navHostController,
     )
 }
 
@@ -66,5 +72,5 @@ fun SettingsUiPreview() {
 @Composable
 @Preview(showBackground = true)
 fun SettingOptionComponentPreview() {
-    SettingOptionComponent(SettingModel("",ActionToClick.Default)){}
+    SettingOptionComponent(SettingModel("",ActionToClick.Default({}))){}
 }

@@ -18,7 +18,7 @@ import com.gilbersoncampos.relicregistry.screen.home.homeScreen
 import com.gilbersoncampos.relicregistry.screen.recordList.recordListScreen
 
 @Composable
-fun NavGraphHost(navHostController: NavHostController) {
+fun NavGraphHost(navHostController: NavHostController,onVerifyUpdate:()->Unit) {
 
     NavHost(
         enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Left) },
@@ -29,7 +29,7 @@ fun NavGraphHost(navHostController: NavHostController) {
         navController = navHostController
     ) {
         //homeScreen()
-        settingsScreen(navHostController)
+        settingsScreen(navHostController,onVerifyUpdate = onVerifyUpdate)
         editRecordScreen(onBack = navHostController::navigateUp)
         recordListScreen(navigateToEditRecord = { navHostController.navigateToEditRecord(it) })
         formScreen()
