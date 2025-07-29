@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
@@ -72,8 +73,8 @@ class RecordListViewModel @Inject constructor(
         }
     }
 
-    fun getImage(name: String): Bitmap {
-        return imageStoreService.getImage(name, false)
+    fun getImage(name: String): File {
+        return imageStoreService.getImageFile(name, false)
     }
 
 }

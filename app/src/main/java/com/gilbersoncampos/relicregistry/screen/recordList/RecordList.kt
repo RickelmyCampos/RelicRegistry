@@ -33,17 +33,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import coil.size.Size
 import com.gilbersoncampos.relicregistry.R
 import com.gilbersoncampos.relicregistry.data.model.CatalogRecordModel
 import com.gilbersoncampos.relicregistry.ui.components.AlertDialogCustom
 import com.gilbersoncampos.relicregistry.ui.components.HeaderActionSelect
 import com.gilbersoncampos.relicregistry.ui.theme.RelicRegistryTheme
+import java.io.File
 
 @Composable
 fun RecordListScreen(
@@ -68,7 +73,7 @@ fun RecordListUI(
     onClickRecord: (Long) -> Unit,
     onSelectRecord: (CatalogRecordModel) -> Unit,
     removeListRecords:()->Unit,
-    getBitmap: (String) -> Bitmap,
+    getBitmap: (String) -> File,
     syncRecords:()-> Unit
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
@@ -145,12 +150,14 @@ fun RecordListUI(
 @Composable
 private fun RelicItem(
     relic: CatalogRecordModel,
-    getBitmap: (String) -> Bitmap,
+    getBitmap: (String) -> File,
     isSelected: Boolean = false,
     onLongPress: () -> Unit,
     onClick: () -> Unit,
 ) {
     val haptics = LocalHapticFeedback.current
+    val context = LocalContext.current
+
     Row(modifier = Modifier
         .fillMaxWidth()
         .combinedClickable(onLongClick = {
@@ -159,6 +166,9 @@ private fun RelicItem(
         }) { onClick() }
         .background(if (isSelected) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.background)
         .padding(6.dp)) {
+        val imageModifier = Modifier
+            .size(50.dp)
+            .background(Color.Gray)
         when{
             isSelected->{
                 Image(
@@ -179,12 +189,19 @@ private fun RelicItem(
                 )
             }
             else->{
-                Image(
-                    bitmap = getBitmap(relic.listImages[0]).asImageBitmap(),
+
+                AsyncImage(
+                    model = ImageRequest.Builder(context)
+                        .data(getBitmap(relic.listImages[0])) // Caminho do arquivo, URI ou URL
+                        .crossfade(true) // Efeito de fade suave ao carregar
+                        // .placeholder(R.drawable.ic_image_loading_placeholder) // Opcional: um drawable de placeholder
+                        // .error(R.drawable.ic_image_error_placeholder) // Opcional: um drawable de erro
+                        .size(50) // Ou especifique um tamanho para otimizar o carregamento
+                        // .transformations(...) // Para cortar em círculo, etc.
+                        .build(),
                     contentDescription = "image relic",
-                    modifier = Modifier
-                        .size(50.dp)
-                        .background(Color.Gray)
+                    modifier = imageModifier,
+                    contentScale = ContentScale.Crop // Ou outra escala apropriada
                 )
             }
         }
@@ -201,6 +218,6 @@ private fun RelicItem(
 @Composable
 fun RecordListUIPreview() {
     RelicRegistryTheme {
-        RecordListUI(RecordUiState.Loading, {}, {},{}, { BitmapFactory.decodeFile("") },{})
+        RecordListUI(RecordUiState.Loading, {}, {},{}, { File("") },{})
     }
 }

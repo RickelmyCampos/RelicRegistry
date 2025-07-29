@@ -119,7 +119,7 @@ class ExternalPrivateImageStoreService(private val appContext: Context) : ImageS
         return File(appDirectory, "$nameImage.jpg")
     }
 
-    private fun getImageFile(nameImage: String, fromCache: Boolean) = File(
+    override fun getImageFile(nameImage: String, fromCache: Boolean) = File(
         if (fromCache) appContext.externalCacheDir else appContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES),
         "$FILE_FOLDER/$nameImage.jpg"
     )

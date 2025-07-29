@@ -69,6 +69,10 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
+    //coil
+    implementation("io.coil-kt:coil-compose:2.6.0")
+
     //charts
     implementation("com.github.tehras:charts:0.2.4-alpha")
     implementation(libs.androidx.hilt.common)
